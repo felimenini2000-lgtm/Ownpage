@@ -351,7 +351,7 @@ export default function Home() {
 
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-4 md:mb-0">
-              <p className="text-muted-foreground text-sm">© 2024 VYRON. All rights reserved.</p>
+              <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} VYRON. All rights reserved.</p>
             </div>
             <div className="flex gap-6">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
