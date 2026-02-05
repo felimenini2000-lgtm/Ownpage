@@ -21,6 +21,11 @@ export default function Home() {
   })
   const [submitted, setSubmitted] = useState(false)
 
+  const scrollToId = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -93,15 +98,16 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex gap-8 items-center">
-              <a href="#services" className="text-sm hover:text-primary transition-colors">
+              <a href="#services" onClick={scrollToId('services')} className="text-sm hover:text-primary transition-colors">
                 Servicios
               </a>
-              <a href="#about" className="text-sm hover:text-primary transition-colors">
+              <a href="#about" onClick={scrollToId('about')} className="text-sm hover:text-primary transition-colors">
                 Nosotros
               </a>
-              <a href="#contact" className="text-sm hover:text-primary transition-colors">
+              <a href="#contact" onClick={scrollToId('contact')} className="text-sm hover:text-primary transition-colors">
                 Contacto
               </a>
+
 
               <button
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
