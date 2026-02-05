@@ -126,6 +126,7 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4" style={{ animationDelay: '0.2s' }}>
+
             </div>
           </div>
 
@@ -148,7 +149,7 @@ export default function Home() {
 
 
       {/* Services */}
-      <section id="services" className="relative py-24 px-4 border-t border-border">
+      <section id="services" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Nuestros Servicios</h2>
@@ -223,7 +224,7 @@ export default function Home() {
       </section>
 
       {/* About */}
-      <section id="about" className="relative py-24 px-4 border-t border-border">
+      <section id="about" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in-up">
@@ -262,7 +263,7 @@ export default function Home() {
       </section>
 
       {/* Contact */}
-      <section id="contact" className="relative py-24 px-4 border-t border-border">
+      <section id="contact" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12 animate-fade-in-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h2>
@@ -306,7 +307,7 @@ export default function Home() {
               />
             </div>
 
-            <Button type="submit" size="lg" className="w-full --accent hover:bg-primary/90 text-primary-foreground">
+            <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               {submitted ? '✓ Mensaje Enviado!' : 'Enviar Mensaje'}
             </Button>
           </form>
