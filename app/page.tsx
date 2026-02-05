@@ -126,7 +126,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-accent via-accent to-accent bg-clip-text text-transparent">
                   Protegemos y modernizamos
                 </span>{' '}
                 <span className="text-foreground">la tecnología de tu empresa.</span>
