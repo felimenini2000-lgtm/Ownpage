@@ -93,9 +93,14 @@ export default function Home() {
         {/* Navigation */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-            <div className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer"
+              aria-label="Ir al inicio"
+            >
               VYRON
-            </div>
+            </button>
+
 
             <div className="hidden md:flex gap-8 items-center">
               <a href="#services" onClick={scrollToId('services')} className="text-sm hover:text-primary transition-colors">
