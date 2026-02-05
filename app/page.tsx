@@ -126,21 +126,6 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4" style={{ animationDelay: '0.2s' }}>
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground group w-fit"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Empezar Ahora <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-accent/50 hover:border-accent hover:bg-accent/10 bg-transparent w-fit"
-              >
-                Más Información
-              </Button>
             </div>
           </div>
 
@@ -321,7 +306,7 @@ export default function Home() {
               />
             </div>
 
-            <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button type="submit" size="lg" className="w-full --accent hover:bg-primary/90 text-primary-foreground">
               {submitted ? '✓ Mensaje Enviado!' : 'Enviar Mensaje'}
             </Button>
           </form>
