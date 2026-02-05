@@ -66,6 +66,9 @@ function Sparkline({ values }: { values: number[] }) {
 
     ctx.clearRect(0, 0, w, h)
 
+    // Guard: si todavía no hay datos suficientes
+    if (!values || values.length < 2) return
+
     const min = Math.min(...values)
     const max = Math.max(...values)
     const span = Math.max(1e-6, max - min)
@@ -103,7 +106,10 @@ function Sparkline({ values }: { values: number[] }) {
 
 export const CommandCenter = () => {
   const rand = useMemo(() => mulberry32(20260205), [])
-  const [tick, setTick] = useState(0)
+
+  // Separado: UI (métricas/series) vs LOGS
+  const [uiTick, setUiTick] = useState(0)
+  const [logTick, setLogTick] = useState(0)
 
   const [metrics, setMetrics] = useState<Metric[]>([
     { key: 'blocked', label: 'Threats blocked', value: 1284, icon: ShieldCheck, sub: 'Active mitigation' },
@@ -132,11 +138,19 @@ export const CommandCenter = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // UI tick (métricas + sparklines) -> fluido
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 900)
+    const id = setInterval(() => setUiTick((t) => t + 1), 900)
     return () => clearInterval(id)
   }, [])
 
+  // LOG tick -> lento (1 evento cada 3-5s aprox)
+  useEffect(() => {
+    const id = setInterval(() => setLogTick((t) => t + 1), 4000) // podés ajustar a 3000 o 5000
+    return () => clearInterval(id)
+  }, [])
+
+  // Actualiza métricas + sparklines con uiTick
   useEffect(() => {
     // Metrics live (simulado)
     setMetrics((prev) =>
@@ -173,8 +187,10 @@ export const CommandCenter = () => {
       bump('cloud', 60, 4)
       return next
     })
+  }, [uiTick, rand])
 
-    // Logs
+  // Genera logs SOLO con logTick
+  useEffect(() => {
     const blocks = [
       ['BLOCK', 'Brute-force attempt blocked', 'Gateway'],
       ['BLOCK', 'Suspicious DNS query denied', 'Resolver'],
@@ -195,9 +211,11 @@ export const CommandCenter = () => {
 
     const roll = rand()
     const pick =
-      roll < 0.55 ? blocks[Math.floor(rand() * blocks.length)] :
-        roll < 0.82 ? infos[Math.floor(rand() * infos.length)] :
-          warns[Math.floor(rand() * warns.length)]
+      roll < 0.55
+        ? blocks[Math.floor(rand() * blocks.length)]
+        : roll < 0.82
+          ? infos[Math.floor(rand() * infos.length)]
+          : warns[Math.floor(rand() * warns.length)]
 
     setLogs((prev) => {
       const n: LogItem = {
@@ -210,7 +228,7 @@ export const CommandCenter = () => {
       // Importante: suficiente cantidad para ticker, sin necesidad de scroll
       return [n, ...prev].slice(0, 14)
     })
-  }, [tick, rand])
+  }, [logTick, rand])
 
   const currentLevel = logs[0]?.level ?? 'INFO'
 
@@ -231,9 +249,7 @@ export const CommandCenter = () => {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.65)]" />
-            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">
-              VYRON SOC • Live telemetry
-            </div>
+            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">VYRON SOC • Live telemetry</div>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -320,12 +336,12 @@ export const CommandCenter = () => {
             </div>
 
             {/* Ticker wrapper: NO scroll, NO barra */}
-            <div className="relative px-4 py-3 min-h-0 flex-1 overflow-hidden">
+            <div className="relative px-4 py-3 min-h-0 flex-1 overflow-hidden group">
               {/* Fade top/bottom */}
               <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background/40 to-transparent z-10" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background/50 to-transparent z-10" />
 
-              {/* Ticker content (se pausa al hover) */}
+              {/* Ticker content */}
               <div className="cc-ticker h-full">
                 {loopLogs.map((l, idx) => (
                   <div key={`${l.id}-${idx}`} className="py-2">
@@ -375,7 +391,7 @@ export const CommandCenter = () => {
                 ))}
               </div>
 
-              {/* Hover to pause hint (invisible, but functional) */}
+              {/* Overlay “hitbox” para hover cómodo */}
               <div className="absolute inset-0" />
             </div>
           </div>
@@ -384,25 +400,42 @@ export const CommandCenter = () => {
 
       <style jsx global>{`
         @keyframes cc-scan {
-          0% { transform: translateX(-40%); }
-          100% { transform: translateX(140%); }
+          0% {
+            transform: translateX(-40%);
+          }
+          100% {
+            transform: translateX(140%);
+          }
         }
 
         /* Ticker: mueve la lista sin scroll real */
         @keyframes cc-ticker {
-          0% { transform: translateY(0); }
-          100% { transform: translateY(-50%); }
+          0% {
+            transform: translateY(0);
+          }
+          100% {
+            transform: translateY(-50%);
+          }
         }
 
         .cc-ticker {
           display: block;
           will-change: transform;
-          animation: cc-ticker 18s linear infinite;
+          /* MÁS LENTO para que se sienta real */
+          animation: cc-ticker 40s linear infinite;
         }
 
-        /* Pausa al hover sobre el panel (comodísimo para leer) */
-        .cc-ticker:hover {
+        /* Pausa al hover SOBRE EL ÁREA del ticker (no solo el texto) */
+        .group:hover .cc-ticker {
           animation-play-state: paused;
+        }
+
+        /* Accesibilidad */
+        @media (prefers-reduced-motion: reduce) {
+          .cc-ticker {
+            animation: none !important;
+            transform: none !important;
+          }
         }
       `}</style>
     </div>
