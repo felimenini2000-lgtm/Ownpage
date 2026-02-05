@@ -33,7 +33,21 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
+      {/* Global continuous background (TODO se siente parte del HERO) */}
+      <div className="pointer-events-none absolute inset-0">
+        {/* Radials suaves (un solo “canvas”) */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,hsl(var(--accent)/0.12),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_20%_45%,hsl(var(--primary)/0.10),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_70%,hsl(var(--accent)/0.10),transparent_65%)]" />
+
+        {/* Grid global ultra sutil */}
+        <div className="absolute inset-0 opacity-25 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:28px_28px]" />
+
+        {/* Vignette global */}
+        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_60%,transparent_100%)] bg-black/60" />
+      </div>
+
       {/* Floating animation */}
       <style jsx global>{`
         @keyframes float {
@@ -96,13 +110,8 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen pt-24 pb-16 px-4 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20" />
-        </div>
-
+      {/* HERO (y todo lo demás se siente parte del mismo) */}
+      <section className="relative pt-24 pb-10 px-4">
         <div className="relative z-10 max-w-7xl mx-auto w-full">
           {/* Top content */}
           <div className="max-w-3xl animate-fade-in-up">
@@ -125,8 +134,24 @@ export default function Home() {
               <span className="text-accent font-semibold">Soporte local real para PYMES en Uruguay.</span>
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4" style={{ animationDelay: '0.2s' }}>
+            {/* CTA buttons (faltaban en tu archivo) */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground group w-fit"
+                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Empezar Ahora <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
 
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-accent/50 hover:border-accent hover:bg-accent/10 bg-transparent w-fit"
+                onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Más Información
+              </Button>
             </div>
           </div>
 
@@ -138,20 +163,17 @@ export default function Home() {
                 <CommandCenter />
               </div>
 
-              {/* Grid sutil detrás */}
-              <div className="absolute inset-0 z-[-1] bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_55%_55%_at_50%_50%,#000_70%,transparent_100%)]" />
+              {/* Grid sutil detrás (se integra con el fondo global) */}
+              <div className="absolute inset-0 z-[-1] opacity-60 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_55%_55%_at_50%_50%,#000_70%,transparent_100%)]" />
             </div>
           </div>
         </div>
       </section>
 
-
-
-
-      {/* Services */}
-      <section id="services" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
+      {/* SERVICES (sin border-t; mismo canvas) */}
+      <section id="services" className="relative py-16 md:py-20 lg:py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16 animate-fade-in-up">
+          <div className="text-center mb-14 animate-fade-in-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Nuestros Servicios</h2>
             <p className="text-muted-foreground text-lg">Soluciones tecnológicas diseñadas para tu empresa</p>
           </div>
@@ -220,11 +242,14 @@ export default function Home() {
               )
             })}
           </div>
+
+          {/* Separador “invisible” (no parece corte) */}
+          <div className="pointer-events-none mt-16 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
       </section>
 
-      {/* About */}
-      <section id="about" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
+      {/* ABOUT (sin border-t; mismo canvas) */}
+      <section id="about" className="relative py-16 md:py-20 lg:py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in-up">
@@ -259,11 +284,13 @@ export default function Home() {
               <div className="absolute -top-8 -left-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
             </div>
           </div>
+
+          <div className="pointer-events-none mt-16 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </div>
       </section>
 
-      {/* Contact */}
-      <section id="contact" className="relative py-24 md:py-32 lg:py-40 px-4 border-t border-border">
+      {/* CONTACT (sin border-t; mismo canvas) */}
+      <section id="contact" className="relative py-16 md:py-20 lg:py-24 px-4 pb-28">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12 animate-fade-in-up">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h2>
@@ -314,8 +341,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 px-4">
+      {/* Footer (sin border-t duro; integrado) */}
+      <footer className="py-10 px-4">
+        <div className="pointer-events-none mb-10 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
           <div className="text-center md:text-left mb-4 md:mb-0">
             <p className="text-muted-foreground text-sm">© 2024 VYRON. All rights reserved.</p>
