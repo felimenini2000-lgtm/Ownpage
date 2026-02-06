@@ -138,10 +138,13 @@ export default function Home() {
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-accent via-accent to-accent bg-clip-text text-transparent">
-                  Protegemos y modernizamos
+                  NETIDIA
                 </span>{' '}
-                <span className="text-foreground">la tecnología de tu empresa.</span>
+                <span className="text-foreground">
+                  protege, moderniza y desarrolla la tecnología de tu empresa.
+                </span>
               </h1>
+
 
               <p className="text-lg text-muted-foreground mb-8 max-w-md">
                 Ciberseguridad, infraestructura, cloud y desarrollo web.
