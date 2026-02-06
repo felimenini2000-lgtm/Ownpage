@@ -98,7 +98,7 @@ export default function Home() {
               className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer"
               aria-label="Ir al inicio"
             >
-              VYRON
+              NETIDIA
             </button>
 
 
@@ -148,26 +148,6 @@ export default function Home() {
                 <br />
                 <span className="text-accent font-semibold">Soporte local real para PYMES en Uruguay.</span>
               </p>
-
-              {/* CTA buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground group w-fit"
-                  onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Empezar Ahora <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-accent/50 hover:border-accent hover:bg-accent/10 bg-transparent w-fit"
-                  onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  Más Información
-                </Button>
-              </div>
             </div>
 
             {/* Dashboard below */}
@@ -265,18 +245,17 @@ export default function Home() {
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">¿Quiénes Somos?</h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    VYRON es una empresa de tecnología enfocada en proteger y modernizar la tecnología de empresas en
-                    Uruguay. Con un equipo de expertos apasionados por la innovación, entregamos soluciones integrales
-                    en ciberseguridad, infraestructura, cloud y desarrollo web.
+                    NETIDIA es una empresa de tecnología enfocada en el diseño, implementación y evolución de infraestructura digital moderna.
+
+                    Nuestro nombre surge de tres pilares fundamentales de la tecnología actual:
+
+                    Network · Identity · Architecture
                   </p>
                   <p>
-                    Nuestra misión es ser el socio tecnológico de confianza para las PYMES uruguayas. No solo brindamos
-                    servicios, sino que construimos relaciones de largo plazo basadas en resultados medibles y soporte
-                    local real.
+                    Creemos que toda organización necesita una base tecnológica segura, ordenada y escalable para poder crecer.
                   </p>
                   <p>
-                    En VYRON creemos que la tecnología debe ser accesible y potente. Cada solución está diseñada
-                    específicamente para las necesidades de tu empresa, con atención personalizada y costos justos.
+                    Por eso trabajamos en construir soluciones que conecten redes, protejan identidades digitales y sostengan arquitecturas preparadas para el futuro.
                   </p>
                 </div>
               </div>
@@ -356,7 +335,7 @@ export default function Home() {
 
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-4 md:mb-0">
-              <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} VYRON. All rights reserved.</p>
+              <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} NETIDIA. All rights reserved.</p>
             </div>
             <div className="flex gap-6">
               <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
