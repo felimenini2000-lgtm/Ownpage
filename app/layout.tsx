@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   description:
     "NETIDIA is a technology company specializing in IT infrastructure, software development, and digital solutions for businesses seeking stability, security, and scalability.",
   generator: "v0.app",
+    icons: {
+    icon: "/icon.png",
+  }
 };
 
 export default function RootLayout({
