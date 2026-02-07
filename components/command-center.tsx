@@ -45,7 +45,7 @@ function nowHHMMSS() {
   return `${hh}:${mm}:${ss}`
 }
 
-// Sparkline: blanco suave (como en la referencia)
+// Sparkline: blanco suave
 function Sparkline({ values }: { values: number[] }) {
   const ref = useRef<HTMLCanvasElement | null>(null)
 
@@ -66,7 +66,6 @@ function Sparkline({ values }: { values: number[] }) {
 
     ctx.clearRect(0, 0, w, h)
 
-    // Guard: si todavía no hay datos suficientes
     if (!values || values.length < 2) return
 
     const min = Math.min(...values)
@@ -120,11 +119,26 @@ export const CommandCenter = () => {
   ])
 
   const [series, setSeries] = useState<Record<string, number[]>>(() => ({}))
+
   const [logs, setLogs] = useState<LogItem[]>(() => [
-    { id: 'l0', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC online', meta: 'VYRON Core' },
+    { id: 'l0', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC online', meta: 'NETIDIA  Core' },
     { id: 'l1', ts: nowHHMMSS(), level: 'INFO', msg: 'Backup verified OK', meta: 'Storage' },
     { id: 'l2', ts: nowHHMMSS(), level: 'BLOCK', msg: 'Ransomware signature blocked', meta: 'Endpoint-12' },
+    { id: 'l3', ts: nowHHMMSS(), level: 'INFO', msg: 'MFA policy enforced', meta: 'Identity' },
+    { id: 'l4', ts: nowHHMMSS(), level: 'WARN', msg: 'Endpoint missing update', meta: 'Endpoint-07' },
+    { id: 'l5', ts: nowHHMMSS(), level: 'INFO', msg: 'VPN health check OK', meta: 'Remote Access' },
+    { id: 'l6', ts: nowHHMMSS(), level: 'INFO', msg: 'Service health OK', meta: 'Cloud' },
+    { id: 'l7', ts: nowHHMMSS(), level: 'INFO', msg: 'Policy sync completed', meta: 'Gateway' },
+    { id: 'l8', ts: nowHHMMSS(), level: 'INFO', msg: 'Integrity checks scheduled', meta: 'Storage' },
+    { id: 'l9', ts: nowHHMMSS(), level: 'INFO', msg: 'Telemetry heartbeat OK', meta: 'NETIDIA Core' },
+    { id: 'l10', ts: nowHHMMSS(), level: 'INFO', msg: 'Threat intel updated', meta: 'Secure Web' },
+    { id: 'l11', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC ruleset loaded', meta: 'NETIDIA Core' },
+    { id: 'l12', ts: nowHHMMSS(), level: 'INFO', msg: 'Backup snapshot created', meta: 'Storage' },
+    { id: 'l13', ts: nowHHMMSS(), level: 'INFO', msg: 'Baseline established', meta: 'Ops' },
   ])
+
+  // para resaltar SOLO el log nuevo (arriba)
+  const [lastLogId, setLastLogId] = useState<string | null>(null)
 
   // init series (una sola vez)
   useEffect(() => {
@@ -138,21 +152,20 @@ export const CommandCenter = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // UI tick (métricas + sparklines) -> fluido
+  // UI tick (métricas + sparklines)
   useEffect(() => {
     const id = setInterval(() => setUiTick((t) => t + 1), 900)
     return () => clearInterval(id)
   }, [])
 
-  // LOG tick -> lento (1 evento cada 3-5s aprox)
+  // LOG tick -> lento (nuevo evento, sin desplazamiento constante)
   useEffect(() => {
-    const id = setInterval(() => setLogTick((t) => t + 1), 4000) // podés ajustar a 3000 o 5000
+    const id = setInterval(() => setLogTick((t) => t + 1), 4000) // 3000..5000 si querés
     return () => clearInterval(id)
   }, [])
 
-  // Actualiza métricas + sparklines con uiTick
+  // métricas + sparklines (uiTick)
   useEffect(() => {
-    // Metrics live (simulado)
     setMetrics((prev) =>
       prev.map((m) => {
         if (m.key === 'blocked') {
@@ -170,7 +183,6 @@ export const CommandCenter = () => {
       })
     )
 
-    // Sparklines
     setSeries((prev) => {
       const next: Record<string, number[]> = { ...prev }
       const bump = (k: string, base: number, amp: number) => {
@@ -189,7 +201,7 @@ export const CommandCenter = () => {
     })
   }, [uiTick, rand])
 
-  // Genera logs SOLO con logTick
+  // logs: SIEMPRE entra arriba y empuja a los demás (solo cuando llega evento)
   useEffect(() => {
     const blocks = [
       ['BLOCK', 'Brute-force attempt blocked', 'Gateway'],
@@ -217,23 +229,22 @@ export const CommandCenter = () => {
           ? infos[Math.floor(rand() * infos.length)]
           : warns[Math.floor(rand() * warns.length)]
 
-    setLogs((prev) => {
-      const n: LogItem = {
-        id: `l${Date.now()}_${Math.floor(rand() * 1e6)}`,
-        ts: nowHHMMSS(),
-        level: pick[0],
-        msg: pick[1],
-        meta: pick[2],
-      }
-      // Importante: suficiente cantidad para ticker, sin necesidad de scroll
-      return [n, ...prev].slice(0, 14)
-    })
+    const n: LogItem = {
+      id: `l${Date.now()}_${Math.floor(rand() * 1e6)}`,
+      ts: nowHHMMSS(),
+      level: pick[0],
+      msg: pick[1],
+      meta: pick[2],
+    }
+
+    setLogs((prev) => [n, ...prev].slice(0, 14))
+    setLastLogId(n.id)
+
+    const t = window.setTimeout(() => setLastLogId(null), 700)
+    return () => window.clearTimeout(t)
   }, [logTick, rand])
 
   const currentLevel = logs[0]?.level ?? 'INFO'
-
-  // Duplicamos la lista para loop perfecto (sin scrollbar)
-  const loopLogs = useMemo(() => [...logs, ...logs], [logs])
 
   return (
     <div className="relative w-full h-full">
@@ -249,7 +260,7 @@ export const CommandCenter = () => {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.65)]" />
-            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">VYRON SOC • Live telemetry</div>
+            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">Netidia SOC • Live telemetry</div>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -273,14 +284,29 @@ export const CommandCenter = () => {
                 return (
                   <div
                     key={m.key}
-                    className={`relative overflow-hidden rounded-xl border border-border/60 bg-background/20 p-4 ${span}`}
+                    className={[
+                      'group relative overflow-hidden rounded-xl border border-border/60 bg-background/20 p-4',
+                      'transition-colors duration-200',
+                      'hover:border-border/80 hover:bg-background/25',
+                      span,
+                    ].join(' ')}
                   >
+                    {/* glow suave de base */}
                     <div
                       className="absolute inset-0 opacity-60"
                       style={{
                         background: 'radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.10), transparent 55%)',
                       }}
                     />
+
+                    {/* hover glow (solo en hover) */}
+                    <div
+                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                      style={{
+                        background: 'radial-gradient(circle at 35% 25%, hsl(var(--accent) / 0.16), transparent 60%)',
+                      }}
+                    />
+
                     <div className="relative flex items-start justify-between gap-3">
                       <div>
                         <div className="text-xs text-muted-foreground">{m.label}</div>
@@ -293,7 +319,7 @@ export const CommandCenter = () => {
                       </div>
 
                       <div className="flex flex-col items-end gap-2">
-                        <div className="grid place-items-center rounded-lg border border-border/60 bg-background/30 p-2">
+                        <div className="grid place-items-center rounded-lg border border-border/60 bg-background/30 p-2 transition-colors duration-200 group-hover:border-border/80">
                           <Icon className="h-5 w-5" style={{ color: 'hsl(var(--accent))' }} />
                         </div>
                         <div className="opacity-95">
@@ -302,20 +328,14 @@ export const CommandCenter = () => {
                       </div>
                     </div>
 
-                    <div
-                      className="absolute inset-x-0 top-0 h-[1px] opacity-40"
-                      style={{
-                        background: 'linear-gradient(90deg, transparent, hsl(var(--accent) / 0.75), transparent)',
-                        animation: 'cc-scan 3.5s linear infinite',
-                      }}
-                    />
+                    {/* ✅ Quitado: la línea/scan que recorre el contorno */}
                   </div>
                 )
               })}
             </div>
           </div>
 
-          {/* LOGS (SIN SCROLLBAR) */}
+          {/* LOGS (SIN DESPLAZAMIENTO CONSTANTE) */}
           <div className="col-span-12 lg:col-span-5 rounded-xl border border-border/60 bg-background/20 overflow-hidden flex flex-col min-h-0">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
               <div className="flex items-center gap-2 min-w-0">
@@ -335,16 +355,22 @@ export const CommandCenter = () => {
               </div>
             </div>
 
-            {/* Ticker wrapper: NO scroll, NO barra */}
-            <div className="relative px-4 py-3 min-h-0 flex-1 overflow-hidden group">
-              {/* Fade top/bottom */}
+            <div className="relative px-4 py-3 min-h-0 flex-1 overflow-hidden">
+              {/* Fade top/bottom (premium) */}
               <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background/40 to-transparent z-10" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background/50 to-transparent z-10" />
 
-              {/* Ticker content */}
-              <div className="cc-ticker h-full">
-                {loopLogs.map((l, idx) => (
-                  <div key={`${l.id}-${idx}`} className="py-2">
+              {/* Lista QUIETA: solo cambia cuando llega un evento */}
+              <div className="h-full">
+                {logs.map((l, idx) => (
+                  <div
+                    key={l.id}
+                    className={[
+                      'py-2',
+                      idx !== 0 ? '' : '',
+                      l.id === lastLogId ? 'cc-new' : '',
+                    ].join(' ')}
+                  >
                     <div className="flex items-start gap-3">
                       <div
                         className="mt-1 h-2 w-2 rounded-full shrink-0"
@@ -391,7 +417,6 @@ export const CommandCenter = () => {
                 ))}
               </div>
 
-              {/* Overlay “hitbox” para hover cómodo */}
               <div className="absolute inset-0" />
             </div>
           </div>
@@ -399,42 +424,28 @@ export const CommandCenter = () => {
       </div>
 
       <style jsx global>{`
-        @keyframes cc-scan {
+        /* Flash/entrada suave SOLO para el log nuevo (arriba) */
+        @keyframes cc-new {
           0% {
-            transform: translateX(-40%);
+            transform: translateY(-6px);
+            opacity: 0.55;
+            background: hsl(var(--accent) / 0.12);
           }
           100% {
-            transform: translateX(140%);
-          }
-        }
-
-        /* Ticker: mueve la lista sin scroll real */
-        @keyframes cc-ticker {
-          0% {
             transform: translateY(0);
+            opacity: 1;
+            background: hsl(var(--accent) / 0);
           }
-          100% {
-            transform: translateY(-50%);
-          }
         }
 
-        .cc-ticker {
-          display: block;
-          will-change: transform;
-          /* MÁS LENTO para que se sienta real */
-          animation: cc-ticker 40s linear infinite;
+        .cc-new {
+          border-radius: 10px;
+          animation: cc-new 520ms ease-out;
         }
 
-        /* Pausa al hover SOBRE EL ÁREA del ticker (no solo el texto) */
-        .group:hover .cc-ticker {
-          animation-play-state: paused;
-        }
-
-        /* Accesibilidad */
         @media (prefers-reduced-motion: reduce) {
-          .cc-ticker {
+          .cc-new {
             animation: none !important;
-            transform: none !important;
           }
         }
       `}</style>

@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import { ArrowRight, Zap, Code2, Lock, Server, Cloud, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CommandCenter } from '@/components/command-center'
-import { BackgroundParticles } from '@/components/background-particles'
 
 type Service = {
   icon: React.ElementType
@@ -40,9 +39,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
-      {/* 1) Partículas (fondo vivo) */}
-      <BackgroundParticles />
-
       {/* 2) Fondo global continuo (radials + grid + vignette) */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,hsl(var(--accent)/0.12),transparent_60%)]" />
@@ -168,7 +164,7 @@ export default function Home() {
         </section>
 
         {/* SERVICES (sin corte duro) */}
-        <section id="services" className="relative py-16 md:py-20 lg:py-24 px-4">
+        <section id="services" className="relative py-16 md:py-28 lg:py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14 animate-fade-in-up">
               <h2 className="text-4xl md:text-5xl font-bold mb-4">Nuestros Servicios</h2>
@@ -241,7 +237,7 @@ export default function Home() {
         </section>
 
         {/* ABOUT */}
-        <section id="about" className="relative py-16 md:py-20 lg:py-24 px-4">
+        <section id="about" className="relative py-16 md:py-28 lg:py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="animate-fade-in-up">
@@ -281,7 +277,7 @@ export default function Home() {
         </section>
 
         {/* CONTACT */}
-        <section id="contact" className="relative py-16 md:py-20 lg:py-24 px-4 pb-28">
+        <section id="contact" className="relative py-16 md:py-28 lg:py-24 px-4 pb-28">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
               <h2 className="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h2>
