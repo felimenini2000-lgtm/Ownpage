@@ -139,10 +139,9 @@ export default function Home() {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 aria-label="Ir a contacto para diagnóstico IT sin costo"
-                className="relative px-5 py-2 text-sm font-semibold text-primary-foreground bg-primary rounded-lg overflow-hidden group animate-glow"
+                className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-background/50 text-foreground border border-primary/55 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-300/60 hover:text-white hover:bg-background/70 hover:shadow-xl hover:shadow-cyan-500/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
               >
-                <span className="relative z-10">Diagnóstico IT sin costo</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md" />
+                Diagnóstico IT sin costo
               </button>
             </div>
           </div>
@@ -282,35 +281,44 @@ export default function Home() {
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </section>
 
-{/* ABOUT */}
+        {/* ABOUT */}
         <section id="about" className="relative py-16 md:py-28 lg:py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="animate-fade-in-up">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">¿Quiénes Somos?</h2>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                  ¿Quiénes Somos?
+                </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    NETIDIA es una empresa de tecnología enfocada en el diseño, implementación y evolución de infraestructura digital moderna.
-
-                    Nuestro nombre surge de tres pilares fundamentales de la tecnología actual:
-
-                    Network · Identity · Architecture
+                    NETIDIA es una empresa de tecnología enfocada en el diseño,
+                    implementación y evolución de infraestructura digital
+                    moderna. Nuestro nombre surge de tres pilares fundamentales
+                    de la tecnología actual: Network · Identity · Architecture
                   </p>
                   <p>
-                    Creemos que toda organización necesita una base tecnológica segura, ordenada y escalable para poder crecer.
+                    Creemos que toda organización necesita una base tecnológica
+                    segura, ordenada y escalable para poder crecer.
                   </p>
                   <p>
-                    Por eso trabajamos en construir soluciones que conecten redes, protejan identidades digitales y sostengan arquitecturas preparadas para el futuro.
+                    Por eso trabajamos en construir soluciones que conecten
+                    redes, protejan identidades digitales y sostengan
+                    arquitecturas preparadas para el futuro.
                   </p>
                 </div>
               </div>
 
-              <div className="relative h-96 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+              <div
+                className="relative h-96 animate-fade-in-up"
+                style={{ animationDelay: "0.2s" }}
+              >
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <Zap className="w-24 h-24 text-primary mx-auto mb-4 animate-bounce" />
-                    <p className="text-muted-foreground">Innovation at the core</p>
+                    <p className="text-muted-foreground">
+                      Innovation at the core
+                    </p>
                   </div>
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
