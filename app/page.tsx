@@ -1,43 +1,54 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { ArrowRight, Zap, Code2, Lock, Server, Cloud, Video } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { CommandCenter } from '@/components/command-center'
+import React, { useState } from "react";
+import {
+  ArrowRight,
+  Zap,
+  Code2,
+  Lock,
+  Server,
+  Cloud,
+  Video,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CommandCenter } from "@/components/command-center";
 
 type Service = {
-  icon: React.ElementType
-  title: string
-  pitch: string
-  bullets: string[]
-}
+  icon: React.ElementType;
+  title: string;
+  pitch: string;
+  bullets: string[];
+};
 
 export default function Home() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  })
-  const [submitted, setSubmitted] = useState(false)
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [submitted, setSubmitted] = useState(false);
 
-  const scrollToId = (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  }
+  const scrollToId =
+    (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+      e.preventDefault();
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitted(true)
+    e.preventDefault();
+    setSubmitted(true);
     setTimeout(() => {
-      setSubmitted(false)
-      setFormData({ name: '', email: '', message: '' })
-    }, 2500)
-  }
+      setSubmitted(false);
+      setFormData({ name: "", email: "", message: "" });
+    }, 2500);
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
@@ -91,7 +102,7 @@ export default function Home() {
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer"
               aria-label="Ir al inicio"
             >
@@ -99,18 +110,34 @@ export default function Home() {
             </button>
 
             <div className="hidden md:flex gap-8 items-center">
-              <a href="#services" onClick={scrollToId('services')} className="text-sm hover:text-primary transition-colors">
+              <a
+                href="#services"
+                onClick={scrollToId("services")}
+                className="text-sm hover:text-primary transition-colors"
+              >
                 Servicios
               </a>
-              <a href="#about" onClick={scrollToId('about')} className="text-sm hover:text-primary transition-colors">
+              <a
+                href="#about"
+                onClick={scrollToId("about")}
+                className="text-sm hover:text-primary transition-colors"
+              >
                 Nosotros
               </a>
-              <a href="#contact" onClick={scrollToId('contact')} className="text-sm hover:text-primary transition-colors">
+              <a
+                href="#contact"
+                onClick={scrollToId("contact")}
+                className="text-sm hover:text-primary transition-colors"
+              >
                 Contacto
               </a>
 
               <button
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() =>
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 aria-label="Ir a contacto para diagnóstico IT sin costo"
                 className="relative px-5 py-2 text-sm font-semibold text-primary-foreground bg-primary rounded-lg overflow-hidden group animate-glow"
               >
@@ -134,14 +161,18 @@ export default function Home() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-accent via-accent to-accent bg-clip-text text-transparent">
                   Protegemos y modernizamos
-                </span>{' '}
-                <span className="text-foreground">la tecnología de tu empresa.</span>
+                </span>{" "}
+                <span className="text-foreground">
+                  la tecnología de tu empresa.
+                </span>
               </h1>
 
               <p className="text-lg text-muted-foreground mb-8 max-w-md">
                 Ciberseguridad, infraestructura, cloud y desarrollo web.
                 <br />
-                <span className="text-accent font-semibold">Soporte local real para PYMES en Uruguay.</span>
+                <span className="text-accent font-semibold">
+                  Soporte local real para PYMES en Uruguay.
+                </span>
               </p>
             </div>
 
@@ -158,16 +189,23 @@ export default function Home() {
         </section>
 
         {/* SERVICES */}
-        <section id="services" className="scroll-mt-24 relative py-20 md:py-24 px-4">
+        <section
+          id="services"
+          className="scroll-mt-24 relative py-20 md:py-24 px-4"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Nuestros Servicios</h2>
-              <p className="text-muted-foreground text-lg">Soluciones tecnológicas diseñadas para tu empresa</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Nuestros Servicios
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Soluciones tecnológicas diseñadas para tu empresa
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 auto-rows-fr">
               {services.map((service, index) => {
-                const Icon = service.icon
+                const Icon = service.icon;
 
                 return (
                   <div
@@ -178,7 +216,8 @@ export default function Home() {
                     <div
                       className="absolute -inset-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl"
                       style={{
-                        background: 'radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)',
+                        background:
+                          "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)",
                       }}
                     />
                     <div className="absolute inset-0 opacity-70 pointer-events-none">
@@ -187,7 +226,8 @@ export default function Home() {
                     <div
                       className="absolute left-0 right-0 top-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{
-                        background: 'linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)',
+                        background:
+                          "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)",
                       }}
                     />
 
@@ -198,18 +238,25 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <h3 className="mt-4 text-lg font-semibold leading-tight">{service.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{service.pitch}</p>
+                      <h3 className="mt-4 text-lg font-semibold leading-tight">
+                        {service.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                        {service.pitch}
+                      </p>
 
                       {/* ✅ Fix: margen inferior para que el divider no quede pegado al texto */}
                       <ul className="mt-4 mb-6 space-y-2 text-sm">
                         {service.bullets.map((b, i) => (
-                          <li key={`${service.title}-${i}`} className="flex items-start gap-2 text-foreground/90">
+                          <li
+                            key={`${service.title}-${i}`}
+                            className="flex items-start gap-2 text-foreground/90"
+                          >
                             <span
                               className="mt-[6px] h-1.5 w-1.5 rounded-full"
                               style={{
-                                background: 'hsl(var(--accent))',
-                                boxShadow: '0 0 12px hsl(var(--accent) / 0.35)',
+                                background: "hsl(var(--accent))",
+                                boxShadow: "0 0 12px hsl(var(--accent) / 0.35)",
                               }}
                             />
                             <span className="leading-snug">{b}</span>
@@ -218,12 +265,16 @@ export default function Home() {
                       </ul>
 
                       <div className="mt-auto pt-6 border-t border-border/60 text-xs text-muted-foreground flex items-center justify-between">
-                        <span className="group-hover:text-foreground/80 transition-colors">Respuesta y soporte local</span>
-                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">✓</span>
+                        <span className="group-hover:text-foreground/80 transition-colors">
+                          Respuesta y soporte local
+                        </span>
+                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">
+                          ✓
+                        </span>
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -231,71 +282,66 @@ export default function Home() {
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </section>
 
-        {/* ABOUT */}
-        <section id="about" className="scroll-mt-24 relative py-20 md:py-24 px-4">
+{/* ABOUT */}
+        <section id="about" className="relative py-16 md:py-28 lg:py-24 px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
-              {/* Texto izquierda */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="animate-fade-in-up">
                 <h2 className="text-4xl md:text-5xl font-bold mb-6">¿Quiénes Somos?</h2>
-
-                <div className="space-y-5 text-muted-foreground leading-relaxed text-lg">
+                <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
-                    <span className="text-foreground font-semibold">NETIDIA</span> es una empresa de tecnología enfocada
-                    en el diseño, implementación y evolución de infraestructura digital moderna.
+                    NETIDIA es una empresa de tecnología enfocada en el diseño, implementación y evolución de infraestructura digital moderna.
+
+                    Nuestro nombre surge de tres pilares fundamentales de la tecnología actual:
+
+                    Network · Identity · Architecture
                   </p>
-
                   <p>
-                    Nuestro nombre surge de tres pilares fundamentales de la tecnología actual:{' '}
-                    <span className="text-accent font-medium">Network · Identity · Architecture</span>
+                    Creemos que toda organización necesita una base tecnológica segura, ordenada y escalable para poder crecer.
                   </p>
-
                   <p>
-                    Creemos que toda organización necesita una base tecnológica segura, ordenada y escalable para poder
-                    crecer.
-                  </p>
-
-                  <p>
-                    Por eso trabajamos en construir soluciones que conecten redes, protejan identidades digitales y
-                    sostengan arquitecturas preparadas para el futuro.
+                    Por eso trabajamos en construir soluciones que conecten redes, protejan identidades digitales y sostengan arquitecturas preparadas para el futuro.
                   </p>
                 </div>
               </div>
 
-              {/* Card visual derecha */}
-              <div className="relative animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                <div className="absolute -inset-1 rounded-3xl bg-accent/20 blur-2xl opacity-70" />
-
-                <div className="relative rounded-3xl border border-accent/40 bg-gradient-to-br from-accent/10 via-background/40 to-background/10 backdrop-blur-xl p-10 h-[420px] flex flex-col justify-center">
-                  <div className="flex justify-center mb-10">
-                    <Zap className="w-16 h-16 text-accent drop-shadow-[0_0_25px_hsl(var(--accent)/0.7)]" />
+              <div className="relative h-96 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-lg" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <Zap className="w-24 h-24 text-primary mx-auto mb-4 animate-bounce" />
+                    <p className="text-muted-foreground">Innovation at the core</p>
                   </div>
-
-                  <ul className="space-y-6 text-xl">
-                    {['Network', 'Identity', 'Architecture'].map((item) => (
-                      <li key={item} className="flex items-center gap-4">
-                        <span className="h-3 w-3 rounded-full bg-accent shadow-[0_0_15px_hsl(var(--accent)/0.8)]" />
-                        <span className="text-foreground/90">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
+                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/20 rounded-full blur-2xl" />
+                <div className="absolute -top-8 -left-8 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
               </div>
             </div>
-          </div>
 
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="pointer-events-none mt-16 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          </div>
         </section>
 
         {/* CONTACT */}
-        <section id="contact" className="scroll-mt-24 relative py-20 md:py-24 px-4 pb-28">
+        <section
+          id="contact"
+          className="scroll-mt-24 relative py-20 md:py-24 px-4 pb-28"
+        >
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h2>
-              <p className="text-muted-foreground text-lg">¿Listo para modernizar tu empresa? Déjanos un mensaje.</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Contacta con Nosotros
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                ¿Listo para modernizar tu empresa? Déjanos un mensaje.
+              </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6 animate-fade-in-up"
+              style={{ animationDelay: "0.2s" }}
+            >
               <div className="relative">
                 <input
                   type="text"
@@ -332,8 +378,12 @@ export default function Home() {
                 />
               </div>
 
-              <Button type="submit" size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                {submitted ? '✓ Mensaje Enviado!' : 'Enviar Mensaje'}
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
+                {submitted ? "✓ Mensaje Enviado!" : "Enviar Mensaje"}
               </Button>
             </form>
           </div>
@@ -345,16 +395,27 @@ export default function Home() {
 
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
             <div className="text-center md:text-left mb-4 md:mb-0">
-              <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} NETIDIA. All rights reserved.</p>
+              <p className="text-muted-foreground text-sm">
+                © {new Date().getFullYear()} NETIDIA. All rights reserved.
+              </p>
             </div>
             <div className="flex gap-6">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
                 Privacy
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
                 Terms
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
                 Social
               </a>
             </div>
@@ -362,38 +423,59 @@ export default function Home() {
         </footer>
       </div>
     </div>
-  )
+  );
 }
 
 const services: Service[] = [
   {
     icon: Lock,
-    title: 'Ciberseguridad',
-    pitch: 'Reducimos el riesgo y evitamos interrupciones por ataques o pérdida de datos.',
-    bullets: ['Firewall + hardening + MFA', 'Backups y protección ransomware', 'Monitoreo y respuesta ante incidentes'],
+    title: "Ciberseguridad",
+    pitch:
+      "Reducimos el riesgo y evitamos interrupciones por ataques o pérdida de datos.",
+    bullets: [
+      "Firewall + hardening + MFA",
+      "Backups y protección ransomware",
+      "Monitoreo y respuesta ante incidentes",
+    ],
   },
   {
     icon: Server,
-    title: 'Infraestructura',
-    pitch: 'Redes y servidores estables para que tu operación no se detenga.',
-    bullets: ['Red segura y segmentación', 'Acceso remoto confiable (VPN/ZTNA)', 'Continuidad operativa y soporte'],
+    title: "Infraestructura",
+    pitch: "Redes y servidores estables para que tu operación no se detenga.",
+    bullets: [
+      "Red segura y segmentación",
+      "Acceso remoto confiable (VPN/ZTNA)",
+      "Continuidad operativa y soporte",
+    ],
   },
   {
     icon: Cloud,
-    title: 'Cloud',
-    pitch: 'Modernizamos tu stack para escalar con orden y pagar lo justo.',
-    bullets: ['Microsoft 365 / Google Workspace', 'Backups en nube y recuperación', 'Migración y administración'],
+    title: "Cloud",
+    pitch: "Modernizamos tu stack para escalar con orden y pagar lo justo.",
+    bullets: [
+      "Microsoft 365 / Google Workspace",
+      "Backups en nube y recuperación",
+      "Migración y administración",
+    ],
   },
   {
     icon: Code2,
-    title: 'Desarrollo Web',
-    pitch: 'Web rápida, moderna y lista para generar oportunidades.',
-    bullets: ['Sitios corporativos de alto rendimiento', 'Hosting administrado y seguridad', 'Integración con herramientas'],
+    title: "Desarrollo Web",
+    pitch: "Web rápida, moderna y lista para generar oportunidades.",
+    bullets: [
+      "Sitios corporativos de alto rendimiento",
+      "Hosting administrado y seguridad",
+      "Integración con herramientas",
+    ],
   },
   {
     icon: Video,
-    title: 'CCTV',
-    pitch: 'Vigilancia profesional con acceso remoto y grabación segura.',
-    bullets: ['Cámaras IP y puesta a punto', 'Acceso remoto seguro', 'Grabación local o en nube'],
+    title: "CCTV",
+    pitch: "Vigilancia profesional con acceso remoto y grabación segura.",
+    bullets: [
+      "Cámaras IP y puesta a punto",
+      "Acceso remoto seguro",
+      "Grabación local o en nube",
+    ],
   },
-]
+];
