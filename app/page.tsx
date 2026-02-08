@@ -421,7 +421,7 @@ export default function Home() {
                 Terms
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/company/netidiauy"
                 className="text-muted-foreground hover:text-primary transition-colors text-sm"
               >
                 Social
