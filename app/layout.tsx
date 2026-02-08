@@ -18,37 +18,15 @@ export const metadata: Metadata = {
     "NETIDIA is a technology company specializing in IT infrastructure, software development, and digital solutions for businesses seeking stability, security, and scalability.",
 
   icons: {
-    icon: "/icon.png",          // favicon navegador
-    shortcut: "/icon.png",
-    apple: "/icon.png",         // iPhone/iPad
-  },
-
-  openGraph: {
-    title: "NETIDIA | IT Infrastructure & Software Development",
-    description:
-      "Technology solutions for businesses seeking stability, security, and scalability.",
-    url: "https://netidia.com", // ← cambiá por tu dominio real
-    siteName: "NETIDIA",
-    images: [
-      {
-        url: "/icon.png",   // ← imagen preview
-        width: 1200,
-        height: 630,
-        alt: "NETIDIA Technology Services",
-      },
+    icon: [
+      { url: "/favicon.ico" }, // MUY IMPORTANTE para Chromium/Google
+      { url: "/icon.png", type: "image/png" },
     ],
-    locale: "en_US",
-    type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "NETIDIA | IT Infrastructure & Software Development",
-    description:
-      "Technology solutions for businesses seeking stability, security, and scalability.",
-    images: ["/og-image.jpg"],
+    apple: [{ url: "/icon.png" }],
+    shortcut: ["/favicon.ico"],
   },
 };
+
 
 export default function RootLayout({
   children,
