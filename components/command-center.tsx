@@ -45,7 +45,7 @@ function nowHHMMSS() {
   return `${hh}:${mm}:${ss}`
 }
 
-// Sparkline: blanco suave
+// ✅ Sparkline con color accent en lugar de blanco puro → más legible y coherente
 function Sparkline({ values }: { values: number[] }) {
   const ref = useRef<HTMLCanvasElement | null>(null)
 
@@ -63,7 +63,6 @@ function Sparkline({ values }: { values: number[] }) {
     c.style.width = `${w}px`
     c.style.height = `${h}px`
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-
     ctx.clearRect(0, 0, w, h)
 
     if (!values || values.length < 2) return
@@ -71,11 +70,18 @@ function Sparkline({ values }: { values: number[] }) {
     const min = Math.min(...values)
     const max = Math.max(...values)
     const span = Math.max(1e-6, max - min)
-
     const padX = 2
     const padY = 4
 
-    const path = () => {
+    // ✅ Leer el color accent desde la CSS variable del documento
+    const accentRaw =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--accent')
+        .trim() || '189 100% 50%'
+
+    const accentColor = `hsl(${accentRaw})`
+
+    const drawPath = () => {
       ctx.beginPath()
       values.forEach((v, i) => {
         const x = padX + (i / (values.length - 1)) * (w - padX * 2)
@@ -85,43 +91,72 @@ function Sparkline({ values }: { values: number[] }) {
       })
     }
 
-    // Glow
+    // Glow layer
     ctx.lineWidth = 4
     ctx.lineJoin = 'round'
     ctx.lineCap = 'round'
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)'
-    path()
+    ctx.strokeStyle = `hsl(${accentRaw} / 0.18)`
+    drawPath()
     ctx.stroke()
 
-    // Main
-    ctx.lineWidth = 2
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)'
-    path()
+    // Main line
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = `hsl(${accentRaw} / 0.65)`
+    drawPath()
     ctx.stroke()
+
+    // Fill under the line
+    const lastX = padX + ((values.length - 1) / (values.length - 1)) * (w - padX * 2)
+    const baseY = h - padY
+    ctx.lineTo(lastX, baseY)
+    ctx.lineTo(padX, baseY)
+    ctx.closePath()
+    const grad = ctx.createLinearGradient(0, padY, 0, h)
+    grad.addColorStop(0, `hsl(${accentRaw} / 0.18)`)
+    grad.addColorStop(1, `hsl(${accentRaw} / 0.0)`)
+    ctx.fillStyle = grad
+    ctx.fill()
+
+    void accentColor // suppress unused warning
   }, [values])
 
   return <canvas ref={ref} className="block" />
 }
 
+// ✅ Tipo para el estado unificado de UI (métricas + series en un solo objeto)
+type UIState = {
+  metrics: Metric[]
+  series: Record<string, number[]>
+}
+
+const INITIAL_METRICS: Metric[] = [
+  { key: 'blocked', label: 'Threats blocked', value: 1284, icon: ShieldCheck, sub: 'Active mitigation' },
+  { key: 'uptime', label: 'Uptime', value: 99.98, unit: '%', icon: Activity, sub: 'SLA monitoring' },
+  { key: 'endpoints', label: 'Endpoints protected', value: 42, icon: Lock, sub: 'Policy enforced' },
+  { key: 'backups', label: 'Backups verified', value: 14, icon: Server, sub: 'Integrity checks' },
+  { key: 'cloud', label: 'Cloud services', value: 7, icon: Cloud, sub: 'Service health' },
+]
+
 export const CommandCenter = () => {
   const rand = useMemo(() => mulberry32(20260205), [])
 
-  // Separado: UI (métricas/series) vs LOGS
-  const [uiTick, setUiTick] = useState(0)
+  // ✅ Reloj como estado propio con su intervalo dedicado → siempre actualizado
+  const [clock, setClock] = useState(nowHHMMSS)
+  useEffect(() => {
+    const id = setInterval(() => setClock(nowHHMMSS()), 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // ✅ Métricas + series en un solo setState → un solo re-render por tick
+  const [ui, setUI] = useState<UIState>({
+    metrics: INITIAL_METRICS,
+    series: {},
+  })
+
   const [logTick, setLogTick] = useState(0)
 
-  const [metrics, setMetrics] = useState<Metric[]>([
-    { key: 'blocked', label: 'Threats blocked', value: 1284, icon: ShieldCheck, sub: 'Active mitigation' },
-    { key: 'uptime', label: 'Uptime', value: 99.98, unit: '%', icon: Activity, sub: 'SLA monitoring' },
-    { key: 'endpoints', label: 'Endpoints protected', value: 42, icon: Lock, sub: 'Policy enforced' },
-    { key: 'backups', label: 'Backups verified', value: 14, icon: Server, sub: 'Integrity checks' },
-    { key: 'cloud', label: 'Cloud services', value: 7, icon: Cloud, sub: 'Service health' },
-  ])
-
-  const [series, setSeries] = useState<Record<string, number[]>>(() => ({}))
-
   const [logs, setLogs] = useState<LogItem[]>(() => [
-    { id: 'l0', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC online', meta: 'NETIDIA  Core' },
+    { id: 'l0', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC online', meta: 'NETIDIA Core' },
     { id: 'l1', ts: nowHHMMSS(), level: 'INFO', msg: 'Backup verified OK', meta: 'Storage' },
     { id: 'l2', ts: nowHHMMSS(), level: 'BLOCK', msg: 'Ransomware signature blocked', meta: 'Endpoint-12' },
     { id: 'l3', ts: nowHHMMSS(), level: 'INFO', msg: 'MFA policy enforced', meta: 'Identity' },
@@ -137,71 +172,68 @@ export const CommandCenter = () => {
     { id: 'l13', ts: nowHHMMSS(), level: 'INFO', msg: 'Baseline established', meta: 'Ops' },
   ])
 
-  // para resaltar SOLO el log nuevo (arriba)
   const [lastLogId, setLastLogId] = useState<string | null>(null)
 
-  // init series (una sola vez)
+  // Init series una sola vez
   useEffect(() => {
-    setSeries({
-      blocked: Array.from({ length: 24 }, () => 70 + rand() * 20),
-      uptime: Array.from({ length: 24 }, () => 90 + rand() * 5),
-      endpoints: Array.from({ length: 24 }, () => 40 + rand() * 10),
-      backups: Array.from({ length: 24 }, () => 55 + rand() * 15),
-      cloud: Array.from({ length: 24 }, () => 50 + rand() * 20),
-    })
+    setUI((prev) => ({
+      ...prev,
+      series: {
+        blocked: Array.from({ length: 24 }, () => 70 + rand() * 20),
+        uptime: Array.from({ length: 24 }, () => 90 + rand() * 5),
+        endpoints: Array.from({ length: 24 }, () => 40 + rand() * 10),
+        backups: Array.from({ length: 24 }, () => 55 + rand() * 15),
+        cloud: Array.from({ length: 24 }, () => 50 + rand() * 20),
+      },
+    }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // UI tick (métricas + sparklines)
+  // ✅ Un solo intervalo para métricas + series → un re-render cada 900ms
   useEffect(() => {
-    const id = setInterval(() => setUiTick((t) => t + 1), 900)
-    return () => clearInterval(id)
-  }, [])
+    const id = setInterval(() => {
+      setUI((prev) => {
+        const nextMetrics = prev.metrics.map((m) => {
+          if (m.key === 'blocked') {
+            const inc = rand() < 0.75 ? 1 + Math.floor(rand() * 4) : 0
+            return { ...m, value: m.value + inc }
+          }
+          if (m.key === 'uptime') {
+            const v = clamp(m.value + (rand() - 0.5) * 0.01, 99.92, 100)
+            return { ...m, value: Math.round(v * 100) / 100 }
+          }
+          if (m.key === 'endpoints') return { ...m, value: clamp(m.value + (rand() < 0.1 ? 1 : 0), 40, 80) }
+          if (m.key === 'backups') return { ...m, value: clamp(m.value + (rand() < 0.2 ? 1 : 0), 10, 40) }
+          if (m.key === 'cloud') return { ...m, value: clamp(m.value + (rand() < 0.08 ? 1 : 0), 5, 20) }
+          return m
+        })
 
-  // LOG tick -> lento (nuevo evento, sin desplazamiento constante)
-  useEffect(() => {
-    const id = setInterval(() => setLogTick((t) => t + 1), 4000) // 3000..5000 si querés
-    return () => clearInterval(id)
-  }, [])
+        const nextSeries = { ...prev.series }
+        const bump = (k: string, base: number, amp: number) => {
+          const arr = nextSeries[k] ?? []
+          if (arr.length === 0) return
+          const last = arr[arr.length - 1] ?? base
+          const v = last + (rand() - 0.5) * amp
+          nextSeries[k] = [...arr.slice(1), clamp(v, base - amp * 2, base + amp * 2)]
+        }
+        bump('blocked', 80, 8)
+        bump('uptime', 92, 1.5)
+        bump('endpoints', 48, 2.5)
+        bump('backups', 62, 3.5)
+        bump('cloud', 60, 4)
 
-  // métricas + sparklines (uiTick)
-  useEffect(() => {
-    setMetrics((prev) =>
-      prev.map((m) => {
-        if (m.key === 'blocked') {
-          const inc = rand() < 0.75 ? 1 + Math.floor(rand() * 4) : 0
-          return { ...m, value: m.value + inc }
-        }
-        if (m.key === 'uptime') {
-          const v = clamp(m.value + (rand() - 0.5) * 0.01, 99.92, 100)
-          return { ...m, value: Math.round(v * 100) / 100 }
-        }
-        if (m.key === 'endpoints') return { ...m, value: clamp(m.value + (rand() < 0.1 ? 1 : 0), 40, 80) }
-        if (m.key === 'backups') return { ...m, value: clamp(m.value + (rand() < 0.2 ? 1 : 0), 10, 40) }
-        if (m.key === 'cloud') return { ...m, value: clamp(m.value + (rand() < 0.08 ? 1 : 0), 5, 20) }
-        return m
+        return { metrics: nextMetrics, series: nextSeries }
       })
-    )
+    }, 900)
+    return () => clearInterval(id)
+  }, [rand])
 
-    setSeries((prev) => {
-      const next: Record<string, number[]> = { ...prev }
-      const bump = (k: string, base: number, amp: number) => {
-        const arr = next[k] ?? []
-        if (arr.length === 0) return
-        const last = arr[arr.length - 1] ?? base
-        const v = last + (rand() - 0.5) * amp
-        next[k] = [...arr.slice(1), clamp(v, base - amp * 2, base + amp * 2)]
-      }
-      bump('blocked', 80, 8)
-      bump('uptime', 92, 1.5)
-      bump('endpoints', 48, 2.5)
-      bump('backups', 62, 3.5)
-      bump('cloud', 60, 4)
-      return next
-    })
-  }, [uiTick, rand])
+  // Log tick separado (más lento)
+  useEffect(() => {
+    const id = setInterval(() => setLogTick((t) => t + 1), 4000)
+    return () => clearInterval(id)
+  }, [])
 
-  // logs: SIEMPRE entra arriba y empuja a los demás (solo cuando llega evento)
   useEffect(() => {
     const blocks = [
       ['BLOCK', 'Brute-force attempt blocked', 'Gateway'],
@@ -244,11 +276,11 @@ export const CommandCenter = () => {
     return () => window.clearTimeout(t)
   }, [logTick, rand])
 
+  const { metrics, series } = ui
   const currentLevel = logs[0]?.level ?? 'INFO'
 
   return (
     <div className="relative w-full h-full">
-      {/* Marco estable (NO cambia tamaño) */}
       <div className="absolute inset-0 rounded-2xl border border-border/60 bg-card/10 backdrop-blur-md shadow-[0_0_80px_rgba(0,0,0,0.35)]" />
       <div
         className="absolute -inset-6 rounded-[28px] blur-2xl opacity-40 pointer-events-none"
@@ -260,18 +292,21 @@ export const CommandCenter = () => {
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.65)]" />
-            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">Netidia SOC • Live telemetry</div>
+            <div className="text-xs sm:text-sm text-muted-foreground leading-tight">
+              Netidia SOC • Live telemetry
+            </div>
           </div>
 
+          {/* ✅ clock es estado → siempre actualizado independientemente de otros renders */}
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="hidden sm:inline">Session:</span>
             <span className="w-[92px] text-center rounded-full border border-border/60 bg-background/30 px-2 py-1 tabular-nums">
-              {nowHHMMSS()}
+              {clock}
             </span>
           </div>
         </div>
 
-        {/* Layout fijo */}
+        {/* Layout */}
         <div className="mt-5 grid h-[calc(100%-44px)] grid-cols-12 gap-4 overflow-hidden relative">
           {/* MÉTRICAS */}
           <div className="col-span-12 lg:col-span-7">
@@ -291,15 +326,12 @@ export const CommandCenter = () => {
                       span,
                     ].join(' ')}
                   >
-                    {/* glow suave de base */}
                     <div
                       className="absolute inset-0 opacity-60"
                       style={{
                         background: 'radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.10), transparent 55%)',
                       }}
                     />
-
-                    {/* hover glow (solo en hover) */}
                     <div
                       className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                       style={{
@@ -311,7 +343,6 @@ export const CommandCenter = () => {
                       <div>
                         <div className="text-xs text-muted-foreground">{m.label}</div>
                         <div className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{v}</div>
-
                         <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
                           <ArrowUpRight className="h-3.5 w-3.5" style={{ color: 'hsl(var(--accent))' }} />
                           <span>{m.sub}</span>
@@ -327,15 +358,13 @@ export const CommandCenter = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* ✅ Quitado: la línea/scan que recorre el contorno */}
                   </div>
                 )
               })}
             </div>
           </div>
 
-          {/* LOGS (SIN DESPLAZAMIENTO CONSTANTE) */}
+          {/* LOGS */}
           <div className="col-span-12 lg:col-span-5 rounded-xl border border-border/60 bg-background/20 overflow-hidden flex flex-col min-h-0">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
               <div className="flex items-center gap-2 min-w-0">
@@ -356,20 +385,14 @@ export const CommandCenter = () => {
             </div>
 
             <div className="relative px-4 py-3 min-h-0 flex-1 overflow-hidden">
-              {/* Fade top/bottom (premium) */}
               <div className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-background/40 to-transparent z-10" />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background/50 to-transparent z-10" />
 
-              {/* Lista QUIETA: solo cambia cuando llega un evento */}
               <div className="h-full">
-                {logs.map((l, idx) => (
+                {logs.map((l) => (
                   <div
                     key={l.id}
-                    className={[
-                      'py-2',
-                      idx !== 0 ? '' : '',
-                      l.id === lastLogId ? 'cc-new' : '',
-                    ].join(' ')}
+                    className={['py-2', l.id === lastLogId ? 'cc-new' : ''].join(' ')}
                   >
                     <div className="flex items-start gap-3">
                       <div
@@ -416,15 +439,12 @@ export const CommandCenter = () => {
                   </div>
                 ))}
               </div>
-
-              <div className="absolute inset-0" />
             </div>
           </div>
         </div>
       </div>
 
       <style jsx global>{`
-        /* Flash/entrada suave SOLO para el log nuevo (arriba) */
         @keyframes cc-new {
           0% {
             transform: translateY(-6px);
