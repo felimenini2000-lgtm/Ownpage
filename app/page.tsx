@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import {
   ArrowRight,
   Zap,
@@ -30,6 +30,10 @@ export default function Home() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xrerrqqj";
 
   const scrollToId =
     (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -38,7 +42,7 @@ export default function Home() {
     };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -46,11 +50,31 @@ export default function Home() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: "", email: "", message: "" });
-    }, 2500);
+    setError(null);
+
+    startTransition(async () => {
+      try {
+        const response = await fetch(FORMSPREE_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (response.ok) {
+          setSubmitted(true);
+          setFormData({ name: "", email: "", message: "" });
+          setTimeout(() => setSubmitted(false), 2500);
+        } else {
+          const data = await response.json();
+          setError(data.error || "Error al enviar el mensaje");
+        }
+      } catch {
+        setError("Error de conexión. Intenta de nuevo.");
+      }
+    });
   };
 
   return (
@@ -67,16 +91,34 @@ export default function Home() {
       {/* Float animation */}
       <style jsx global>{`
         @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-          100% { transform: translateY(0px); }
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
         }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .delay-0 { animation-delay: 0s; }
-        .delay-1000 { animation-delay: 1s; }
-        .delay-2000 { animation-delay: 2s; }
-        .delay-3000 { animation-delay: 3s; }
-        .delay-4000 { animation-delay: 4s; }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .delay-0 {
+          animation-delay: 0s;
+        }
+        .delay-1000 {
+          animation-delay: 1s;
+        }
+        .delay-2000 {
+          animation-delay: 2s;
+        }
+        .delay-3000 {
+          animation-delay: 3s;
+        }
+        .delay-4000 {
+          animation-delay: 4s;
+        }
       `}</style>
 
       <div className="relative z-10">
@@ -92,11 +134,33 @@ export default function Home() {
             </button>
 
             <div className="hidden md:flex gap-8 items-center">
-              <a href="#services" onClick={scrollToId("services")} className="text-sm hover:text-primary transition-colors">Servicios</a>
-              <a href="#about" onClick={scrollToId("about")} className="text-sm hover:text-primary transition-colors">Nosotros</a>
-              <a href="#contact" onClick={scrollToId("contact")} className="text-sm hover:text-primary transition-colors">Contacto</a>
+              <a
+                href="#services"
+                onClick={scrollToId("services")}
+                className="text-sm hover:text-primary transition-colors"
+              >
+                Servicios
+              </a>
+              <a
+                href="#about"
+                onClick={scrollToId("about")}
+                className="text-sm hover:text-primary transition-colors"
+              >
+                Nosotros
+              </a>
+              <a
+                href="#contact"
+                onClick={scrollToId("contact")}
+                className="text-sm hover:text-primary transition-colors"
+              >
+                Contacto
+              </a>
               <button
-                onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                onClick={() =>
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
                 aria-label="Ir a contacto para diagnóstico IT sin costo"
                 className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-background/50 text-foreground border border-primary/55 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-300/60 hover:text-white hover:bg-background/70 hover:shadow-xl hover:shadow-cyan-500/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
               >
@@ -109,7 +173,6 @@ export default function Home() {
         {/* ── HERO ── */}
         <section className="relative pt-24 pb-10 px-4">
           <div className="max-w-7xl mx-auto w-full">
-
             {/* Texto + CTAs */}
             <div className="max-w-3xl animate-fade-in-up">
               <div className="inline-block mb-6 animate-fade-in-down">
@@ -136,9 +199,16 @@ export default function Home() {
               </p>
 
               {/* ✅ CTAs visibles en hero — mobile-first */}
-              <div className="flex flex-col sm:flex-row gap-3 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
+              <div
+                className="flex flex-col sm:flex-row gap-3 animate-fade-in-up"
+                style={{ animationDelay: "0.15s" }}
+              >
                 <button
-                  onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() =>
+                    document
+                      .getElementById("contact")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
                   className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-accent/25 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
                 >
                   Diagnóstico IT sin costo
@@ -168,11 +238,18 @@ export default function Home() {
         </section>
 
         {/* ── SERVICES ── */}
-        <section id="services" className="scroll-mt-24 relative py-20 md:py-24 px-4">
+        <section
+          id="services"
+          className="scroll-mt-24 relative py-20 md:py-24 px-4"
+        >
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-14 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Nuestros Servicios</h2>
-              <p className="text-muted-foreground text-lg">Soluciones tecnológicas diseñadas para tu empresa</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Nuestros Servicios
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Soluciones tecnológicas diseñadas para tu empresa
+              </p>
             </div>
 
             {/* ✅ Grid corregido: 2 cols en md, 3 en lg — evita tarjetas muy angostas en 1024–1280px */}
@@ -187,14 +264,20 @@ export default function Home() {
                   >
                     <div
                       className="absolute -inset-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl"
-                      style={{ background: "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)" }}
+                      style={{
+                        background:
+                          "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)",
+                      }}
                     />
                     <div className="absolute inset-0 opacity-70 pointer-events-none">
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
                     </div>
                     <div
                       className="absolute left-0 right-0 top-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)" }}
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)",
+                      }}
                     />
 
                     <div className="relative z-10 flex flex-col h-full">
@@ -204,15 +287,25 @@ export default function Home() {
                         </div>
                       </div>
 
-                      <h3 className="mt-4 text-lg font-semibold leading-tight">{service.title}</h3>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{service.pitch}</p>
+                      <h3 className="mt-4 text-lg font-semibold leading-tight">
+                        {service.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                        {service.pitch}
+                      </p>
 
                       <ul className="mt-4 mb-6 space-y-2 text-sm">
                         {service.bullets.map((b, i) => (
-                          <li key={`${service.title}-${i}`} className="flex items-start gap-2 text-foreground/90">
+                          <li
+                            key={`${service.title}-${i}`}
+                            className="flex items-start gap-2 text-foreground/90"
+                          >
                             <span
                               className="mt-[6px] h-1.5 w-1.5 rounded-full shrink-0"
-                              style={{ background: "hsl(var(--accent))", boxShadow: "0 0 12px hsl(var(--accent) / 0.35)" }}
+                              style={{
+                                background: "hsl(var(--accent))",
+                                boxShadow: "0 0 12px hsl(var(--accent) / 0.35)",
+                              }}
                             />
                             <span className="leading-snug">{b}</span>
                           </li>
@@ -220,8 +313,12 @@ export default function Home() {
                       </ul>
 
                       <div className="mt-auto pt-6 border-t border-border/60 text-xs text-muted-foreground flex items-center justify-between">
-                        <span className="group-hover:text-foreground/80 transition-colors">Respuesta y soporte local</span>
-                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">✓</span>
+                        <span className="group-hover:text-foreground/80 transition-colors">
+                          Respuesta y soporte local
+                        </span>
+                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">
+                          ✓
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -236,25 +333,28 @@ export default function Home() {
         <section id="about" className="relative py-16 md:py-28 lg:py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-
               {/* Texto */}
               <div className="animate-fade-in-up">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">¿Quiénes Somos?</h2>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                  ¿Quiénes Somos?
+                </h2>
                 <div className="space-y-4 text-muted-foreground leading-relaxed">
                   <p>
                     NETIDIA es una empresa de tecnología enfocada en el diseño,
-                    implementación y evolución de infraestructura digital moderna.
-                    Nuestro nombre surge de tres pilares fundamentales:{" "}
-                    <span className="text-accent font-semibold">Network · Identity · Architecture</span>
+                    implementación y evolución de infraestructura digital
+                    moderna. Nuestro nombre surge de tres pilares fundamentales:{" "}
+                    <span className="text-accent font-semibold">
+                      Network · Identity · Architecture
+                    </span>
                   </p>
                   <p>
                     Creemos que toda organización necesita una base tecnológica
                     segura, ordenada y escalable para poder crecer.
                   </p>
                   <p>
-                    Por eso trabajamos en construir soluciones que conecten redes,
-                    protejan identidades digitales y sostengan arquitecturas
-                    preparadas para el futuro.
+                    Por eso trabajamos en construir soluciones que conecten
+                    redes, protejan identidades digitales y sostengan
+                    arquitecturas preparadas para el futuro.
                   </p>
                 </div>
               </div>
@@ -276,14 +376,21 @@ export default function Home() {
                         {/* glow sutil en hover */}
                         <div
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          style={{ background: "radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.12), transparent 60%)" }}
+                          style={{
+                            background:
+                              "radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.12), transparent 60%)",
+                          }}
                         />
                         <div className="relative z-10">
                           <div className="grid place-items-center w-10 h-10 rounded-xl border border-border/60 bg-background/30 mb-3">
                             <Icon className="w-5 h-5 text-accent" />
                           </div>
-                          <p className="text-2xl font-bold text-foreground tabular-nums">{card.stat}</p>
-                          <p className="text-sm text-muted-foreground mt-1 leading-snug">{card.label}</p>
+                          <p className="text-2xl font-bold text-foreground tabular-nums">
+                            {card.stat}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1 leading-snug">
+                            {card.label}
+                          </p>
                         </div>
                       </div>
                     );
@@ -301,11 +408,18 @@ export default function Home() {
         </section>
 
         {/* ── CONTACT ── */}
-        <section id="contact" className="scroll-mt-24 relative py-20 md:py-24 px-4 pb-28">
+        <section
+          id="contact"
+          className="scroll-mt-24 relative py-20 md:py-24 px-4 pb-28"
+        >
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">Contacta con Nosotros</h2>
-              <p className="text-muted-foreground text-lg">¿Listo para modernizar tu empresa? Déjanos un mensaje.</p>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Contacta con Nosotros
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                ¿Listo para modernizar tu empresa? Déjanos un mensaje.
+              </p>
             </div>
 
             <form
@@ -313,6 +427,11 @@ export default function Home() {
               className="space-y-6 animate-fade-in-up"
               style={{ animationDelay: "0.2s" }}
             >
+              {error && (
+                <div className="p-3 text-sm text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  {error}
+                </div>
+              )}
               <input
                 type="text"
                 name="name"
@@ -343,9 +462,14 @@ export default function Home() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                disabled={isPending}
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50"
               >
-                {submitted ? "✓ Mensaje Enviado!" : "Enviar Mensaje"}
+                {submitted
+                  ? "✓ Mensaje Enviado!"
+                  : isPending
+                    ? "Enviando..."
+                    : "Enviar Mensaje"}
               </Button>
             </form>
           </div>
@@ -359,9 +483,24 @@ export default function Home() {
               © {new Date().getFullYear()} NETIDIA. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">Privacy</a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">Terms</a>
-              <a href="https://www.linkedin.com/company/netidiauy" className="text-muted-foreground hover:text-primary transition-colors text-sm">Social</a>
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
+                Privacy
+              </a>
+              <a
+                href="#"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
+                Terms
+              </a>
+              <a
+                href="https://www.linkedin.com/company/netidiauy"
+                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+              >
+                Social
+              </a>
             </div>
           </div>
         </footer>
@@ -376,7 +515,8 @@ const services: Service[] = [
   {
     icon: Lock,
     title: "Ciberseguridad",
-    pitch: "Reducimos el riesgo y evitamos interrupciones por ataques o pérdida de datos.",
+    pitch:
+      "Reducimos el riesgo y evitamos interrupciones por ataques o pérdida de datos.",
     bullets: [
       "Firewall + hardening + MFA",
       "Backups y protección ransomware",
