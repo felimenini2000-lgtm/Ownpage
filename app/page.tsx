@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect, useRef } from "react";
 import {
   ArrowRight,
   Zap,
@@ -27,8 +27,10 @@ export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    subject: "",
     message: "",
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -41,16 +43,65 @@ export default function Home() {
       document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    document.querySelectorAll(".reveal-section").forEach((el) => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = "El nombre es requerido";
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = "El email es requerido";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Ingresa un email válido";
+    }
+    
+    if (!formData.subject.trim()) {
+      newErrors.subject = "El asunto es requerido";
+    }
+    
+    if (!formData.message.trim()) {
+      newErrors.message = "El mensaje es requerido";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!validateForm()) return;
 
     startTransition(async () => {
       try {
@@ -65,7 +116,7 @@ export default function Home() {
 
         if (response.ok) {
           setSubmitted(true);
-          setFormData({ name: "", email: "", message: "" });
+          setFormData({ name: "", email: "", subject: "", message: "" });
           setTimeout(() => setSubmitted(false), 2500);
         } else {
           const data = await response.json();
@@ -78,56 +129,14 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden relative">
-      {/* Fondo global continuo */}
-      <div className="pointer-events-none absolute inset-0 z-0 [contain:paint]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,hsl(var(--accent)/0.12),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_20%_45%,hsl(var(--primary)/0.10),transparent_65%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_85%_70%,hsl(var(--accent)/0.10),transparent_65%)]" />
-        <div className="absolute inset-0 opacity-25 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:28px_28px]" />
-        <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_60%,transparent_100%)] bg-black/50" />
-      </div>
-
-      {/* Float animation */}
-      <style jsx global>{`
-        @keyframes float {
-          0% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-20px);
-          }
-          100% {
-            transform: translateY(0px);
-          }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .delay-0 {
-          animation-delay: 0s;
-        }
-        .delay-1000 {
-          animation-delay: 1s;
-        }
-        .delay-2000 {
-          animation-delay: 2s;
-        }
-        .delay-3000 {
-          animation-delay: 3s;
-        }
-        .delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
-
+    <div className="min-h-screen bg-transparent text-foreground overflow-hidden relative">
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-cyan-500/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent cursor-pointer"
+              className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 bg-clip-text text-transparent cursor-pointer"
               aria-label="Ir al inicio"
             >
               NETIDIA
@@ -137,21 +146,21 @@ export default function Home() {
               <a
                 href="#services"
                 onClick={scrollToId("services")}
-                className="text-sm hover:text-primary transition-colors"
+                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
               >
                 Servicios
               </a>
               <a
                 href="#about"
                 onClick={scrollToId("about")}
-                className="text-sm hover:text-primary transition-colors"
+                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
               >
                 Nosotros
               </a>
               <a
                 href="#contact"
                 onClick={scrollToId("contact")}
-                className="text-sm hover:text-primary transition-colors"
+                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
               >
                 Contacto
               </a>
@@ -162,7 +171,7 @@ export default function Home() {
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
                 aria-label="Ir a contacto para diagnóstico IT sin costo"
-                className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-background/50 text-foreground border border-primary/55 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-300/60 hover:text-white hover:bg-background/70 hover:shadow-xl hover:shadow-cyan-500/20 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/40"
+                className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/40 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-300/60 hover:text-white hover:bg-cyan-500/20 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-95"
               >
                 Diagnóstico IT sin costo
               </button>
@@ -171,21 +180,20 @@ export default function Home() {
         </nav>
 
         {/* ── HERO ── */}
-        <section className="relative pt-24 pb-10 px-4">
+        <section className="relative pt-32 pb-24 px-4 reveal-section">
           <div className="max-w-7xl mx-auto w-full">
             {/* Texto + CTAs */}
             <div className="max-w-3xl animate-fade-in-up">
-              <div className="inline-block mb-6 animate-fade-in-down">
-                <span className="px-4 py-2 bg-primary/10 border border-primary/30 rounded-full text-sm text-primary">
-                  Protección y modernización
-                </span>
+              <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full">
+                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+                <span className="text-sm text-cyan-400 font-medium">Protección y modernización</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                <span className="bg-gradient-to-r from-accent via-accent to-accent bg-clip-text text-transparent">
+                <span className="text-white">
                   Protegemos y modernizamos
                 </span>{" "}
-                <span className="text-foreground">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-300">
                   la tecnología de tu empresa.
                 </span>
               </h1>
@@ -200,7 +208,7 @@ export default function Home() {
 
               {/* ✅ CTAs visibles en hero — mobile-first */}
               <div
-                className="flex flex-col sm:flex-row gap-3 animate-fade-in-up"
+                className="flex flex-col sm:flex-row gap-4 animate-fade-in-up"
                 style={{ animationDelay: "0.15s" }}
               >
                 <button
@@ -209,23 +217,23 @@ export default function Home() {
                       .getElementById("contact")
                       ?.scrollIntoView({ behavior: "smooth" })
                   }
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg bg-accent text-accent-foreground font-semibold text-sm transition-all duration-200 hover:brightness-110 hover:shadow-lg hover:shadow-accent/25 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-400 text-slate-900 font-bold text-sm transition-all duration-300 hover:brightness-110 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:scale-105 active:scale-95"
                 >
                   Diagnóstico IT sin costo
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
 
                 <a
                   href="#services"
                   onClick={scrollToId("services")}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg border border-border/70 text-foreground/80 font-semibold text-sm transition-all duration-200 hover:border-primary/50 hover:text-foreground hover:bg-primary/5 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-cyan-500/40 text-cyan-400 font-semibold text-sm transition-all duration-300 hover:bg-cyan-500/10 hover:border-cyan-400/60 active:scale-95"
                 >
                   Ver servicios
                 </a>
               </div>
             </div>
 
-            {/* CommandCenter — altura original h-[420px] md:h-[520px] */}
+{/* CommandCenter — altura original h-[420px] md:h-[520px] */}
             <div className="mt-12 animate-fade-in-up delay-300">
               <div className="relative w-full max-w-7xl mx-auto">
                 <div className="relative w-full h-[420px] md:h-[520px] lg:h-[520px]">
@@ -233,117 +241,26 @@ export default function Home() {
                 </div>
                 <div className="absolute inset-0 z-[-1] opacity-60 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_55%_55%_at_50%_50%,#000_70%,transparent_100%)]" />
               </div>
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
           </div>
-        </section>
-
-        {/* ── SERVICES ── */}
-        <section
-          id="services"
-          className="scroll-mt-24 relative py-20 md:py-24 px-4"
-        >
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-14 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Nuestros Servicios
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Soluciones tecnológicas diseñadas para tu empresa
-              </p>
-            </div>
-
-            {/* ✅ Grid corregido: 2 cols en md, 3 en lg — evita tarjetas muy angostas en 1024–1280px */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 auto-rows-fr">
-              {services.map((service, index) => {
-                const Icon = service.icon;
-                return (
-                  <div
-                    key={service.title}
-                    className="group relative rounded-2xl border border-border/60 bg-card/10 backdrop-blur-md p-6 overflow-hidden hover:border-primary/50 hover:shadow-[0_0_45px_rgba(0,0,0,0.35)] transition-all duration-300 animate-fade-in-up flex flex-col h-full"
-                    style={{ animationDelay: `${index * 0.08}s` }}
-                  >
-                    <div
-                      className="absolute -inset-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl"
-                      style={{
-                        background:
-                          "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)",
-                      }}
-                    />
-                    <div className="absolute inset-0 opacity-70 pointer-events-none">
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
-                    </div>
-                    <div
-                      className="absolute left-0 right-0 top-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)",
-                      }}
-                    />
-
-                    <div className="relative z-10 flex flex-col h-full">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="grid place-items-center rounded-xl border border-border/60 bg-background/25 p-3">
-                          <Icon className="w-7 h-7 text-primary group-hover:text-accent transition-colors" />
-                        </div>
-                      </div>
-
-                      <h3 className="mt-4 text-lg font-semibold leading-tight">
-                        {service.title}
-                      </h3>
-                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                        {service.pitch}
-                      </p>
-
-                      <ul className="mt-4 mb-6 space-y-2 text-sm">
-                        {service.bullets.map((b, i) => (
-                          <li
-                            key={`${service.title}-${i}`}
-                            className="flex items-start gap-2 text-foreground/90"
-                          >
-                            <span
-                              className="mt-[6px] h-1.5 w-1.5 rounded-full shrink-0"
-                              style={{
-                                background: "hsl(var(--accent))",
-                                boxShadow: "0 0 12px hsl(var(--accent) / 0.35)",
-                              }}
-                            />
-                            <span className="leading-snug">{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="mt-auto pt-6 border-t border-border/60 text-xs text-muted-foreground flex items-center justify-between">
-                        <span className="group-hover:text-foreground/80 transition-colors">
-                          Respuesta y soporte local
-                        </span>
-                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">
-                          ✓
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </section>
 
         {/* ── ABOUT ── */}
-        <section id="about" className="relative py-16 md:py-28 lg:py-24 px-4">
+        <section id="about" className="relative py-32 md:py-40 lg:py-32 px-4 reveal-section">
           <div className="max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* Texto */}
               <div className="animate-fade-in-up">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                   ¿Quiénes Somos?
                 </h2>
-                <div className="space-y-4 text-muted-foreground leading-relaxed">
+                <div className="space-y-4 text-cyan-100/70 leading-relaxed">
                   <p>
                     NETIDIA es una empresa de tecnología enfocada en el diseño,
                     implementación y evolución de infraestructura digital
                     moderna. Nuestro nombre surge de tres pilares fundamentales:{" "}
-                    <span className="text-accent font-semibold">
+                    <span className="text-cyan-400 font-semibold">
                       Network · Identity · Architecture
                     </span>
                   </p>
@@ -378,17 +295,17 @@ export default function Home() {
                           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                           style={{
                             background:
-                              "radial-gradient(circle at 30% 30%, hsl(var(--accent) / 0.12), transparent 60%)",
+                              "radial-gradient(circle at 30% 30%, rgba(6,182,212,0.15), transparent 60%)",
                           }}
                         />
                         <div className="relative z-10">
-                          <div className="grid place-items-center w-10 h-10 rounded-xl border border-border/60 bg-background/30 mb-3">
-                            <Icon className="w-5 h-5 text-accent" />
+                          <div className="grid place-items-center w-10 h-10 rounded-xl border border-cyan-500/30 bg-cyan-500/10 mb-3">
+                            <Icon className="w-5 h-5 text-cyan-400" />
                           </div>
-                          <p className="text-2xl font-bold text-foreground tabular-nums">
+                          <p className="text-2xl font-bold text-white tabular-nums">
                             {card.stat}
                           </p>
-                          <p className="text-sm text-muted-foreground mt-1 leading-snug">
+                          <p className="text-sm text-cyan-100/60 mt-1 leading-snug">
                             {card.label}
                           </p>
                         </div>
@@ -398,72 +315,88 @@ export default function Home() {
                 </div>
 
                 {/* Glow de fondo decorativo */}
-                <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-accent/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -top-8 -left-8 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-8 -right-8 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -top-8 -left-8 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
               </div>
             </div>
-
-            <div className="pointer-events-none mt-16 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
         </section>
 
         {/* ── CONTACT ── */}
         <section
           id="contact"
-          className="scroll-mt-24 relative py-20 md:py-24 px-4 pb-28"
+          className="scroll-mt-24 relative py-32 md:py-40 px-4 pb-32 reveal-section"
         >
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
                 Contacta con Nosotros
               </h2>
-              <p className="text-muted-foreground text-lg">
+              <p className="text-cyan-400/70 text-lg">
                 ¿Listo para modernizar tu empresa? Déjanos un mensaje.
               </p>
             </div>
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 animate-fade-in-up"
+              className="space-y-6 animate-fade-in-up p-8 rounded-2xl border border-cyan-500/20 bg-slate-900/60 backdrop-blur-md"
               style={{ animationDelay: "0.2s" }}
             >
               {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="p-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
                   {error}
                 </div>
               )}
-              <input
-                type="text"
-                name="name"
-                placeholder="Tu Nombre"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-6 py-3 bg-input border border-border rounded-lg focus:border-primary focus:outline-none transition-colors focus:ring-1 focus:ring-primary/50"
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Tu Email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full px-6 py-3 bg-input border border-border rounded-lg focus:border-primary focus:outline-none transition-colors focus:ring-1 focus:ring-primary/50"
-              />
-              <textarea
-                name="message"
-                placeholder="Tu Mensaje"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows={5}
-                className="w-full px-6 py-3 bg-input border border-border rounded-lg focus:border-primary focus:outline-none transition-colors focus:ring-1 focus:ring-primary/50 resize-none"
-              />
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Tu Nombre"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.name ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                />
+                {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
+              </div>
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Tu Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.email ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                />
+                {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Asunto"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.subject ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                />
+                {errors.subject && <p className="mt-1 text-xs text-red-400">{errors.subject}</p>}
+              </div>
+              <div>
+                <textarea
+                  name="message"
+                  placeholder="Tu Mensaje"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows={5}
+                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 resize-none ${errors.message ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                />
+                {errors.message && <p className="mt-1 text-xs text-red-400">{errors.message}</p>}
+              </div>
               <Button
                 type="submit"
                 size="lg"
                 disabled={isPending}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-cyan-500 to-cyan-400 hover:from-cyan-400 hover:to-cyan-300 text-slate-900 font-bold disabled:opacity-50 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]"
               >
                 {submitted
                   ? "✓ Mensaje Enviado!"
@@ -479,25 +412,25 @@ export default function Home() {
         <footer className="py-10 px-4">
           <div className="pointer-events-none mb-10 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-            <p className="text-muted-foreground text-sm text-center md:text-left mb-4 md:mb-0">
+            <p className="text-cyan-100/50 text-sm text-center md:text-left mb-4 md:mb-0">
               © {new Date().getFullYear()} NETIDIA. All rights reserved.
             </p>
             <div className="flex gap-6">
               <a
                 href="#"
-                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
               >
                 Privacy
               </a>
               <a
                 href="#"
-                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
               >
                 Terms
               </a>
               <a
                 href="https://www.linkedin.com/company/netidiauy"
-                className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
               >
                 Social
               </a>

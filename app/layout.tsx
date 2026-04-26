@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AnimatedBackground } from "@/components/animated-background";
 import "./globals.css";
 
 // ✅ Exponer las variables CSS para que globals.css las pueda consumir
@@ -47,6 +48,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
+        <AnimatedBackground />
         {children}
       </body>
     </html>

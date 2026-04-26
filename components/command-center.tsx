@@ -45,6 +45,10 @@ function nowHHMMSS() {
   return `${hh}:${mm}:${ss}`
 }
 
+function INIT_CLOCK() {
+  return '--:--:--'
+}
+
 // ✅ Sparkline con color accent en lugar de blanco puro → más legible y coherente
 function Sparkline({ values }: { values: number[] }) {
   const ref = useRef<HTMLCanvasElement | null>(null)
@@ -141,8 +145,9 @@ export const CommandCenter = () => {
   const rand = useMemo(() => mulberry32(20260205), [])
 
   // ✅ Reloj como estado propio con su intervalo dedicado → siempre actualizado
-  const [clock, setClock] = useState(nowHHMMSS)
+  const [clock, setClock] = useState(INIT_CLOCK)
   useEffect(() => {
+    setClock(nowHHMMSS())
     const id = setInterval(() => setClock(nowHHMMSS()), 1000)
     return () => clearInterval(id)
   }, [])
@@ -155,21 +160,22 @@ export const CommandCenter = () => {
 
   const [logTick, setLogTick] = useState(0)
 
+  // ✅ Logs con timestamps fijos para evitar hydration mismatch
   const [logs, setLogs] = useState<LogItem[]>(() => [
-    { id: 'l0', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC online', meta: 'NETIDIA Core' },
-    { id: 'l1', ts: nowHHMMSS(), level: 'INFO', msg: 'Backup verified OK', meta: 'Storage' },
-    { id: 'l2', ts: nowHHMMSS(), level: 'BLOCK', msg: 'Ransomware signature blocked', meta: 'Endpoint-12' },
-    { id: 'l3', ts: nowHHMMSS(), level: 'INFO', msg: 'MFA policy enforced', meta: 'Identity' },
-    { id: 'l4', ts: nowHHMMSS(), level: 'WARN', msg: 'Endpoint missing update', meta: 'Endpoint-07' },
-    { id: 'l5', ts: nowHHMMSS(), level: 'INFO', msg: 'VPN health check OK', meta: 'Remote Access' },
-    { id: 'l6', ts: nowHHMMSS(), level: 'INFO', msg: 'Service health OK', meta: 'Cloud' },
-    { id: 'l7', ts: nowHHMMSS(), level: 'INFO', msg: 'Policy sync completed', meta: 'Gateway' },
-    { id: 'l8', ts: nowHHMMSS(), level: 'INFO', msg: 'Integrity checks scheduled', meta: 'Storage' },
-    { id: 'l9', ts: nowHHMMSS(), level: 'INFO', msg: 'Telemetry heartbeat OK', meta: 'NETIDIA Core' },
-    { id: 'l10', ts: nowHHMMSS(), level: 'INFO', msg: 'Threat intel updated', meta: 'Secure Web' },
-    { id: 'l11', ts: nowHHMMSS(), level: 'INFO', msg: 'SOC ruleset loaded', meta: 'NETIDIA Core' },
-    { id: 'l12', ts: nowHHMMSS(), level: 'INFO', msg: 'Backup snapshot created', meta: 'Storage' },
-    { id: 'l13', ts: nowHHMMSS(), level: 'INFO', msg: 'Baseline established', meta: 'Ops' },
+    { id: 'l0', ts: '--:--:--', level: 'INFO', msg: 'SOC online', meta: 'NETIDIA Core' },
+    { id: 'l1', ts: '--:--:--', level: 'INFO', msg: 'Backup verified OK', meta: 'Storage' },
+    { id: 'l2', ts: '--:--:--', level: 'BLOCK', msg: 'Ransomware signature blocked', meta: 'Endpoint-12' },
+    { id: 'l3', ts: '--:--:--', level: 'INFO', msg: 'MFA policy enforced', meta: 'Identity' },
+    { id: 'l4', ts: '--:--:--', level: 'WARN', msg: 'Endpoint missing update', meta: 'Endpoint-07' },
+    { id: 'l5', ts: '--:--:--', level: 'INFO', msg: 'VPN health check OK', meta: 'Remote Access' },
+    { id: 'l6', ts: '--:--:--', level: 'INFO', msg: 'Service health OK', meta: 'Cloud' },
+    { id: 'l7', ts: '--:--:--', level: 'INFO', msg: 'Policy sync completed', meta: 'Gateway' },
+    { id: 'l8', ts: '--:--:--', level: 'INFO', msg: 'Integrity checks scheduled', meta: 'Storage' },
+    { id: 'l9', ts: '--:--:--', level: 'INFO', msg: 'Telemetry heartbeat OK', meta: 'NETIDIA Core' },
+    { id: 'l10', ts: '--:--:--', level: 'INFO', msg: 'Threat intel updated', meta: 'Secure Web' },
+    { id: 'l11', ts: '--:--:--', level: 'INFO', msg: 'SOC ruleset loaded', meta: 'NETIDIA Core' },
+    { id: 'l12', ts: '--:--:--', level: 'INFO', msg: 'Backup snapshot created', meta: 'Storage' },
+    { id: 'l13', ts: '--:--:--', level: 'INFO', msg: 'Baseline established', meta: 'Ops' },
   ])
 
   const [lastLogId, setLastLogId] = useState<string | null>(null)
