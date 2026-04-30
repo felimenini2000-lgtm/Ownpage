@@ -233,6 +233,7 @@ export default function Home() {
               </div>
             </div>
 
+
 {/* CommandCenter — altura original h-[420px] md:h-[520px] */}
             <div className="mt-12 animate-fade-in-up delay-300">
               <div className="relative w-full max-w-7xl mx-auto">
@@ -244,6 +245,98 @@ export default function Home() {
               <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
           </div>
+        </section>
+
+         {/* ── SERVICES ── */}
+        <section
+          id="services"
+          className="relative py-32 md:py-40 lg:py-32 px-4 reveal-section"
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-14 animate-fade-in-up">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                Nuestros Servicios
+              </h2>
+              <p className="text-muted-foreground text-lg">
+                Soluciones tecnológicas diseñadas para tu empresa
+              </p>
+            </div>
+
+            {/* ✅ Grid corregido: 2 cols en md, 3 en lg — evita tarjetas muy angostas en 1024–1280px */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 auto-rows-fr">
+              {services.map((service, index) => {
+                const Icon = service.icon;
+                return (
+                  <div
+                    key={service.title}
+                    className="group relative rounded-2xl border border-border/60 bg-card/10 backdrop-blur-md p-6 overflow-hidden hover:border-primary/50 hover:shadow-[0_0_45px_rgba(0,0,0,0.35)] transition-all duration-300 animate-fade-in-up flex flex-col h-full"
+                    style={{ animationDelay: `${index * 0.08}s` }}
+                  >
+                    <div
+                      className="absolute -inset-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl"
+                      style={{
+                        background:
+                          "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)",
+                      }}
+                    />
+                    <div className="absolute inset-0 opacity-70 pointer-events-none">
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+                    </div>
+                    <div
+                      className="absolute left-0 right-0 top-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)",
+                      }}
+                    />
+
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="grid place-items-center rounded-xl border border-border/60 bg-background/25 p-3">
+                          <Icon className="w-7 h-7 text-primary group-hover:text-accent transition-colors" />
+                        </div>
+                      </div>
+
+                      <h3 className="mt-4 text-lg font-semibold leading-tight">
+                        {service.title}
+                      </h3>
+                      <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                        {service.pitch}
+                      </p>
+
+                      <ul className="mt-4 mb-6 space-y-2 text-sm">
+                        {service.bullets.map((b, i) => (
+                          <li
+                            key={`${service.title}-${i}`}
+                            className="flex items-start gap-2 text-foreground/90"
+                          >
+                            <span
+                              className="mt-[6px] h-1.5 w-1.5 rounded-full shrink-0"
+                              style={{
+                                background: "hsl(var(--accent))",
+                                boxShadow: "0 0 12px hsl(var(--accent) / 0.35)",
+                              }}
+                            />
+                            <span className="leading-snug">{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <div className="mt-auto pt-6 border-t border-border/60 text-xs text-muted-foreground flex items-center justify-between">
+                        <span className="group-hover:text-foreground/80 transition-colors">
+                          Respuesta y soporte local
+                        </span>
+                        <span className="opacity-60 group-hover:opacity-100 transition-opacity">
+                          ✓
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
         </section>
 
         {/* ── ABOUT ── */}
