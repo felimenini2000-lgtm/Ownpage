@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition, useEffect, useRef } from "react";
+import React, { useState, useTransition, useEffect } from "react";
 import {
   ArrowRight,
   Zap,
@@ -12,7 +12,10 @@ import {
   Shield,
   Users,
   MapPin,
+  Moon,
+  Sun,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { CommandCenter } from "@/components/command-center";
 
@@ -34,8 +37,15 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [themeMounted, setThemeMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const isLightTheme = themeMounted && theme === "light";
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xrerrqqj";
+
+  useEffect(() => {
+    setThemeMounted(true);
+  }, []);
 
   const scrollToId =
     (id: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -132,51 +142,61 @@ export default function Home() {
     <div className="min-h-screen bg-transparent text-foreground overflow-hidden relative">
       <div className="relative z-10">
         {/* Navigation */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-cyan-500/10">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 shadow-sm shadow-cyan-950/5 backdrop-blur-md border-b border-cyan-500/20 dark:bg-slate-950/80 dark:shadow-none dark:border-cyan-500/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-cyan-300 bg-clip-text text-transparent cursor-pointer"
+              className="text-2xl font-bold bg-gradient-to-r from-cyan-700 via-cyan-600 to-sky-500 bg-clip-text text-transparent cursor-pointer dark:from-cyan-400 dark:to-cyan-300"
               aria-label="Ir al inicio"
             >
               NETIDIA
             </button>
 
             <div className="hidden md:flex gap-8 items-center">
-              <a
-                href="#services"
-                onClick={scrollToId("services")}
-                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
-              >
-                Servicios
-              </a>
-              <a
-                href="#about"
-                onClick={scrollToId("about")}
-                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
-              >
-                Nosotros
-              </a>
-              <a
-                href="#contact"
-                onClick={scrollToId("contact")}
-                className="text-sm text-cyan-100/70 hover:text-cyan-400 transition-colors"
-              >
-                Contacto
-              </a>
-              <button
-                onClick={() =>
-                  document
-                    .getElementById("contact")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-                aria-label="Ir a contacto para diagnóstico IT sin costo"
-                className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/40 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-300/60 hover:text-white hover:bg-cyan-500/20 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] active:scale-95"
-              >
-                Diagnóstico IT sin costo
-              </button>
+                <a
+                  href="#services"
+                  onClick={scrollToId("services")}
+                  className="text-sm text-slate-700 hover:text-cyan-700 transition-colors dark:text-cyan-100/70 dark:hover:text-cyan-400"
+                >
+                  Servicios
+                </a>
+                <a
+                  href="#about"
+                  onClick={scrollToId("about")}
+                  className="text-sm text-slate-700 hover:text-cyan-700 transition-colors dark:text-cyan-100/70 dark:hover:text-cyan-400"
+                >
+                  Nosotros
+                </a>
+                <a
+                  href="#contact"
+                  onClick={scrollToId("contact")}
+                  className="text-sm text-slate-700 hover:text-cyan-700 transition-colors dark:text-cyan-100/70 dark:hover:text-cyan-400"
+                >
+                  Contacto
+                </a>
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById("contact")
+                      ?.scrollIntoView({ behavior: "smooth" })
+                  }
+                  aria-label="Ir a contacto para diagnóstico IT sin costo"
+                  className="relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-semibold rounded-lg bg-cyan-500/10 text-cyan-700 border border-cyan-500/40 backdrop-blur-sm transition-all duration-300 ease-out hover:border-cyan-500/60 hover:text-cyan-950 hover:bg-cyan-500/20 hover:shadow-[0_0_20px_rgba(6,182,212,0.22)] active:scale-95 dark:text-cyan-400 dark:hover:border-cyan-300/60 dark:hover:text-white dark:hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                >
+                  Diagnóstico IT sin costo
+                </button>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setTheme(isLightTheme ? "dark" : "light")}
+            className="absolute right-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-700 backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/60 hover:bg-cyan-500/20 hover:text-cyan-950 active:scale-95 sm:right-6 lg:right-8 dark:text-cyan-300 dark:hover:border-cyan-300/60 dark:hover:text-white"
+            aria-label={isLightTheme ? "Activar modo oscuro" : "Activar modo claro"}
+            title={isLightTheme ? "Modo oscuro" : "Modo claro"}
+          >
+            {isLightTheme ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+          </button>
         </nav>
 
         {/* ── HERO ── */}
@@ -186,14 +206,14 @@ export default function Home() {
             <div className="max-w-3xl animate-fade-in-up">
               <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 rounded-full">
                 <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                <span className="text-sm text-cyan-400 font-medium">Protección y modernización</span>
+                <span className="text-sm text-cyan-700 font-medium dark:text-cyan-400">Protección y modernización</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-                <span className="text-white">
+                <span className="text-slate-950 dark:text-white">
                   Protegemos y modernizamos
                 </span>{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-300">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-700 to-sky-500 dark:from-cyan-400 dark:to-cyan-300">
                   la tecnología de tu empresa.
                 </span>
               </h1>
@@ -226,7 +246,7 @@ export default function Home() {
                 <a
                   href="#services"
                   onClick={scrollToId("services")}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-cyan-500/40 text-cyan-400 font-semibold text-sm transition-all duration-300 hover:bg-cyan-500/10 hover:border-cyan-400/60 active:scale-95"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-cyan-500/40 text-cyan-700 font-semibold text-sm transition-all duration-300 hover:bg-cyan-500/10 hover:border-cyan-500/60 active:scale-95 dark:text-cyan-400 dark:hover:border-cyan-400/60"
                 >
                   Ver servicios
                 </a>
@@ -242,7 +262,7 @@ export default function Home() {
                 </div>
                 <div className="absolute inset-0 z-[-1] opacity-60 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_55%_55%_at_50%_50%,#000_70%,transparent_100%)]" />
               </div>
-              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-900/10 to-transparent dark:via-white/10" />
             </div>
           </div>
         </section>
@@ -269,7 +289,7 @@ export default function Home() {
                 return (
                   <div
                     key={service.title}
-                    className="group relative rounded-2xl border border-border/60 bg-card/10 backdrop-blur-md p-6 overflow-hidden hover:border-primary/50 hover:shadow-[0_0_45px_rgba(0,0,0,0.35)] transition-all duration-300 animate-fade-in-up flex flex-col h-full"
+                    className="group relative rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md p-6 overflow-hidden hover:border-primary/50 hover:shadow-[0_18px_55px_rgba(15,23,42,0.16)] transition-all duration-300 animate-fade-in-up flex flex-col h-full dark:bg-card/10 dark:hover:shadow-[0_0_45px_rgba(0,0,0,0.35)]"
                     style={{ animationDelay: `${index * 0.08}s` }}
                   >
                     <div
@@ -336,7 +356,7 @@ export default function Home() {
               })}
             </div>
           </div>
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-900/10 to-transparent dark:via-white/10" />
         </section>
 
         {/* ── ABOUT ── */}
@@ -345,15 +365,15 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               {/* Texto */}
               <div className="animate-fade-in-up">
-                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 text-slate-950 dark:text-white">
                   ¿Quiénes Somos?
                 </h2>
-                <div className="space-y-4 text-cyan-100/70 leading-relaxed">
+                <div className="space-y-4 text-slate-700 leading-relaxed dark:text-cyan-100/70">
                   <p>
                     NETIDIA es una empresa de tecnología enfocada en el diseño,
                     implementación y evolución de infraestructura digital
                     moderna. Nuestro nombre surge de tres pilares fundamentales:{" "}
-                    <span className="text-cyan-400 font-semibold">
+                    <span className="text-cyan-700 font-semibold dark:text-cyan-400">
                       Network · Identity · Architecture
                     </span>
                   </p>
@@ -380,25 +400,35 @@ export default function Home() {
                     return (
                       <div
                         key={card.label}
-                        className="group relative rounded-2xl border border-border/60 bg-card/20 backdrop-blur-sm p-5 overflow-hidden hover:border-primary/40 transition-all duration-300"
+                        data-particle-mask="true"
+                        className="group relative rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md p-6 overflow-hidden hover:border-primary/50 hover:shadow-[0_18px_55px_rgba(15,23,42,0.16)] transition-all duration-300 flex flex-col h-full dark:bg-card/10 dark:hover:shadow-[0_0_45px_rgba(0,0,0,0.35)]"
                         style={{ animationDelay: `${0.2 + i * 0.08}s` }}
                       >
-                        {/* glow sutil en hover */}
                         <div
-                          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          className="absolute -inset-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-2xl"
                           style={{
                             background:
-                              "radial-gradient(circle at 30% 30%, rgba(6,182,212,0.15), transparent 60%)",
+                              "radial-gradient(circle at 30% 20%, hsl(var(--accent) / 0.22), transparent 55%)",
                           }}
                         />
-                        <div className="relative z-10">
+                        <div className="absolute inset-0 opacity-70 pointer-events-none">
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+                        </div>
+                        <div
+                          className="absolute left-0 right-0 top-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          style={{
+                            background:
+                              "linear-gradient(90deg, transparent, hsl(var(--accent) / 0.9), transparent)",
+                          }}
+                        />
+                        <div className="relative z-10 flex flex-col h-full">
                           <div className="grid place-items-center w-10 h-10 rounded-xl border border-cyan-500/30 bg-cyan-500/10 mb-3">
-                            <Icon className="w-5 h-5 text-cyan-400" />
+                            <Icon className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
                           </div>
-                          <p className="text-2xl font-bold text-white tabular-nums">
+                          <p className="text-2xl font-bold text-slate-950 tabular-nums dark:text-white">
                             {card.stat}
                           </p>
-                          <p className="text-sm text-cyan-100/60 mt-1 leading-snug">
+                          <p className="text-sm text-slate-600 mt-1 leading-snug dark:text-cyan-100/60">
                             {card.label}
                           </p>
                         </div>
@@ -412,7 +442,7 @@ export default function Home() {
                 <div className="absolute -top-8 -left-8 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
               </div>
             </div>
-            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-900/10 to-transparent dark:via-white/10" />
           </div>
         </section>
 
@@ -423,17 +453,17 @@ export default function Home() {
         >
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12 animate-fade-in-up">
-              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 text-slate-950 dark:text-white">
                 Contacta con Nosotros
               </h2>
-              <p className="text-cyan-400/70 text-lg">
+              <p className="text-cyan-700/80 text-lg dark:text-cyan-400/70">
                 ¿Listo para modernizar tu empresa? Déjanos un mensaje.
               </p>
             </div>
 
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 animate-fade-in-up p-8 rounded-2xl border border-cyan-500/20 bg-slate-900/60 backdrop-blur-md"
+              className="space-y-6 animate-fade-in-up p-8 rounded-2xl border border-cyan-500/25 bg-white/70 shadow-xl shadow-cyan-950/10 backdrop-blur-md dark:bg-slate-900/60 dark:shadow-none"
               style={{ animationDelay: "0.2s" }}
             >
               {error && (
@@ -448,7 +478,7 @@ export default function Home() {
                   placeholder="Tu Nombre"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.name ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                  className={`w-full px-6 py-3 bg-white/70 border rounded-lg text-slate-950 placeholder:text-slate-500/70 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-500/50 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-cyan-100/40 dark:focus:ring-cyan-400/50 ${errors.name ? 'border-red-500' : 'border-cyan-500/25 focus:border-cyan-500 dark:border-cyan-500/20 dark:focus:border-cyan-400'}`}
                 />
                 {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
               </div>
@@ -459,7 +489,7 @@ export default function Home() {
                   placeholder="Tu Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.email ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                  className={`w-full px-6 py-3 bg-white/70 border rounded-lg text-slate-950 placeholder:text-slate-500/70 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-500/50 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-cyan-100/40 dark:focus:ring-cyan-400/50 ${errors.email ? 'border-red-500' : 'border-cyan-500/25 focus:border-cyan-500 dark:border-cyan-500/20 dark:focus:border-cyan-400'}`}
                 />
                 {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email}</p>}
               </div>
@@ -470,7 +500,7 @@ export default function Home() {
                   placeholder="Asunto"
                   value={formData.subject}
                   onChange={handleChange}
-                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 ${errors.subject ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                  className={`w-full px-6 py-3 bg-white/70 border rounded-lg text-slate-950 placeholder:text-slate-500/70 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-500/50 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-cyan-100/40 dark:focus:ring-cyan-400/50 ${errors.subject ? 'border-red-500' : 'border-cyan-500/25 focus:border-cyan-500 dark:border-cyan-500/20 dark:focus:border-cyan-400'}`}
                 />
                 {errors.subject && <p className="mt-1 text-xs text-red-400">{errors.subject}</p>}
               </div>
@@ -481,7 +511,7 @@ export default function Home() {
                   value={formData.message}
                   onChange={handleChange}
                   rows={5}
-                  className={`w-full px-6 py-3 bg-slate-800/50 border rounded-lg text-white placeholder:text-cyan-100/40 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-400/50 resize-none ${errors.message ? 'border-red-500' : 'border-cyan-500/20 focus:border-cyan-400'}`}
+                  className={`w-full px-6 py-3 bg-white/70 border rounded-lg text-slate-950 placeholder:text-slate-500/70 focus:outline-none transition-colors focus:ring-1 focus:ring-cyan-500/50 resize-none dark:bg-slate-800/50 dark:text-white dark:placeholder:text-cyan-100/40 dark:focus:ring-cyan-400/50 ${errors.message ? 'border-red-500' : 'border-cyan-500/25 focus:border-cyan-500 dark:border-cyan-500/20 dark:focus:border-cyan-400'}`}
                 />
                 {errors.message && <p className="mt-1 text-xs text-red-400">{errors.message}</p>}
               </div>
@@ -503,27 +533,27 @@ export default function Home() {
 
         {/* ── Footer ── */}
         <footer className="py-10 px-4">
-          <div className="pointer-events-none mb-10 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          <div className="pointer-events-none mb-10 h-px w-full bg-gradient-to-r from-transparent via-slate-900/10 to-transparent dark:via-white/10" />
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-            <p className="text-cyan-100/50 text-sm text-center md:text-left mb-4 md:mb-0">
+            <p className="text-slate-600 text-sm text-center md:text-left mb-4 md:mb-0 dark:text-cyan-100/50">
               © {new Date().getFullYear()} NETIDIA. All rights reserved.
             </p>
             <div className="flex gap-6">
               <a
                 href="#"
-                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
+                className="text-slate-600 hover:text-cyan-700 transition-colors text-sm dark:text-cyan-100/50 dark:hover:text-cyan-400"
               >
                 Privacy
               </a>
               <a
                 href="#"
-                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
+                className="text-slate-600 hover:text-cyan-700 transition-colors text-sm dark:text-cyan-100/50 dark:hover:text-cyan-400"
               >
                 Terms
               </a>
               <a
                 href="https://www.linkedin.com/company/netidiauy"
-                className="text-cyan-100/50 hover:text-cyan-400 transition-colors text-sm"
+                className="text-slate-600 hover:text-cyan-700 transition-colors text-sm dark:text-cyan-100/50 dark:hover:text-cyan-400"
               >
                 Social
               </a>

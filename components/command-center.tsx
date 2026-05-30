@@ -286,8 +286,11 @@ export const CommandCenter = () => {
   const currentLevel = logs[0]?.level ?? 'INFO'
 
   return (
-    <div className="relative w-full h-full">
-      <div className="absolute inset-0 rounded-2xl border border-border/60 bg-card/10 backdrop-blur-md shadow-[0_0_80px_rgba(0,0,0,0.35)]" />
+    <div data-particle-mask="true" className="relative w-full h-full">
+      <div className="absolute inset-0 rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md overflow-hidden dark:bg-card/10" />
+      <div className="absolute inset-0 opacity-70 pointer-events-none rounded-2xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5" />
+      </div>
       <div
         className="absolute -inset-6 rounded-[28px] blur-2xl opacity-40 pointer-events-none"
         style={{ background: 'radial-gradient(circle at 60% 40%, hsl(var(--accent) / 0.22), transparent 60%)' }}
@@ -326,9 +329,9 @@ export const CommandCenter = () => {
                   <div
                     key={m.key}
                     className={[
-                      'group relative overflow-hidden rounded-xl border border-border/60 bg-background/20 p-4',
+                      'group relative overflow-hidden rounded-xl border border-border/60 bg-background/60 p-4 dark:bg-background/20',
                       'transition-colors duration-200',
-                      'hover:border-border/80 hover:bg-background/25',
+                      'hover:border-border/80 hover:bg-background/70 dark:hover:bg-background/25',
                       span,
                     ].join(' ')}
                   >
@@ -371,7 +374,7 @@ export const CommandCenter = () => {
           </div>
 
           {/* LOGS */}
-          <div className="col-span-12 lg:col-span-5 rounded-xl border border-border/60 bg-background/20 overflow-hidden flex flex-col min-h-0">
+          <div className="col-span-12 lg:col-span-5 rounded-xl border border-border/60 bg-background/60 overflow-hidden flex flex-col min-h-0 dark:bg-background/20">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60 shrink-0">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="grid place-items-center rounded-lg border border-border/60 bg-background/30 p-2">
